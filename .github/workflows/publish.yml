@@ -101,8 +101,8 @@ jobs:
     - name: Restore workloads
       run: dotnet workload restore src/HihaArvio/HihaArvio.csproj
 
-    - name: Restore dependencies
-      run: dotnet restore src/HihaArvio/HihaArvio.csproj
+    - name: Restore dependencies for iOS
+      run: dotnet restore src/HihaArvio/HihaArvio.csproj -f net8.0-ios
 
     - name: Build iOS Release
       run: |
@@ -148,8 +148,8 @@ jobs:
     - name: Restore workloads
       run: dotnet workload restore src/HihaArvio/HihaArvio.csproj
 
-    - name: Restore dependencies
-      run: dotnet restore src/HihaArvio/HihaArvio.csproj
+    - name: Restore dependencies for macOS Catalyst
+      run: dotnet restore src/HihaArvio/HihaArvio.csproj -f net8.0-maccatalyst
 
     - name: Build macOS Catalyst Release
       run: |
