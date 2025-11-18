@@ -21,13 +21,13 @@ jobs:
         dotnet-version: '8.0.x'
 
     - name: Restore dependencies
-      run: dotnet restore HihaArvio.sln
+      run: dotnet restore tests/HihaArvio.Tests/HihaArvio.Tests.csproj
 
-    - name: Build solution
-      run: dotnet build HihaArvio.sln --configuration Release --no-restore -f net8.0
+    - name: Build test project
+      run: dotnet build tests/HihaArvio.Tests/HihaArvio.Tests.csproj --configuration Release --no-restore
 
     - name: Run tests
-      run: dotnet test HihaArvio.sln --configuration Release --no-build --verbosity normal -f net8.0 --logger "trx;LogFileName=test-results.trx"
+      run: dotnet test tests/HihaArvio.Tests/HihaArvio.Tests.csproj --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=test-results.trx"
 
     - name: Publish test results
       uses: dorny/test-reporter@v1

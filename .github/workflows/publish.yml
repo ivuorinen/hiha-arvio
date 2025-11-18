@@ -98,17 +98,18 @@ jobs:
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
 
-    - name: Install MAUI workload
-      run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
+    - name: Restore workloads
+      run: dotnet workload restore src/HihaArvio/HihaArvio.csproj
 
     - name: Restore dependencies
-      run: dotnet restore HihaArvio.sln
+      run: dotnet restore src/HihaArvio/HihaArvio.csproj
 
     - name: Build iOS Release
       run: |
         dotnet publish src/HihaArvio/HihaArvio.csproj \
           -f net8.0-ios \
           -c Release \
+          --no-restore \
           /p:ApplicationDisplayVersion=${{ needs.create-release.outputs.version }} \
           /p:ApplicationVersion=${{ github.run_number }} \
           /p:ArchiveOnBuild=false \
@@ -144,17 +145,18 @@ jobs:
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
 
-    - name: Install MAUI workload
-      run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
+    - name: Restore workloads
+      run: dotnet workload restore src/HihaArvio/HihaArvio.csproj
 
     - name: Restore dependencies
-      run: dotnet restore HihaArvio.sln
+      run: dotnet restore src/HihaArvio/HihaArvio.csproj
 
     - name: Build macOS Catalyst Release
       run: |
         dotnet publish src/HihaArvio/HihaArvio.csproj \
           -f net8.0-maccatalyst \
           -c Release \
+          --no-restore \
           /p:ApplicationDisplayVersion=${{ needs.create-release.outputs.version }} \
           /p:ApplicationVersion=${{ github.run_number }} \
           /p:ArchiveOnBuild=false \

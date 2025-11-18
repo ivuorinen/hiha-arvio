@@ -21,14 +21,14 @@ jobs:
       with:
         dotnet-version: '8.0.x'
 
-    - name: Install MAUI workload
-      run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
+    - name: Restore workloads
+      run: dotnet workload restore src/HihaArvio/HihaArvio.csproj
 
     - name: Restore dependencies
-      run: dotnet restore HihaArvio.sln
+      run: dotnet restore src/HihaArvio/HihaArvio.csproj
 
     - name: Build iOS
-      run: dotnet build src/HihaArvio/HihaArvio.csproj -f net8.0-ios -c Release /p:ArchiveOnBuild=false /p:EnableCodeSigning=false
+      run: dotnet build src/HihaArvio/HihaArvio.csproj -f net8.0-ios -c Release --no-restore /p:ArchiveOnBuild=false /p:EnableCodeSigning=false
 
     - name: Upload iOS build artifacts
       uses: actions/upload-artifact@v4
@@ -52,14 +52,14 @@ jobs:
       with:
         dotnet-version: '8.0.x'
 
-    - name: Install MAUI workload
-      run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
+    - name: Restore workloads
+      run: dotnet workload restore src/HihaArvio/HihaArvio.csproj
 
     - name: Restore dependencies
-      run: dotnet restore HihaArvio.sln
+      run: dotnet restore src/HihaArvio/HihaArvio.csproj
 
     - name: Build macOS Catalyst
-      run: dotnet build src/HihaArvio/HihaArvio.csproj -f net8.0-maccatalyst -c Release /p:ArchiveOnBuild=false /p:EnableCodeSigning=false
+      run: dotnet build src/HihaArvio/HihaArvio.csproj -f net8.0-maccatalyst -c Release --no-restore /p:ArchiveOnBuild=false /p:EnableCodeSigning=false
 
     - name: Upload macOS build artifacts
       uses: actions/upload-artifact@v4
