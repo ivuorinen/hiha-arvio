@@ -3,7 +3,10 @@
 	<PropertyGroup>
 		<!-- Per spec: iOS (primary), Web (Blazor), macOS (tertiary) -->
 		<!-- net8.0 included for unit testing without platform dependencies -->
-		<TargetFrameworks>net8.0;net8.0-ios;net8.0-maccatalyst</TargetFrameworks>
+		<!-- Include iOS/macOS targets only on macOS (where they can be built) -->
+		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('OSX'))">net8.0;net8.0-ios;net8.0-maccatalyst</TargetFrameworks>
+		<!-- On Linux/Windows, only include net8.0 -->
+		<TargetFrameworks Condition="!$([MSBuild]::IsOSPlatform('OSX'))">net8.0</TargetFrameworks>
 
 		<!-- Note for MacCatalyst:
 		The default runtime is maccatalyst-x64, except in Release config, in which case the default is maccatalyst-x64;maccatalyst-arm64.

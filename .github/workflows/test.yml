@@ -24,9 +24,6 @@ jobs:
       with:
         dotnet-version: '8.0.x'
 
-    - name: Install WebAssembly Tools workload
-      run: dotnet workload install wasm-tools-net8
-
     - name: Restore dependencies
       run: dotnet restore tests/HihaArvio.Tests/HihaArvio.Tests.csproj /p:TargetFrameworks=net8.0
 
