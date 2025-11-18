@@ -86,7 +86,7 @@ jobs:
 
   build-and-publish-ios:
     name: Build and Publish iOS
-    runs-on: macos-14
+    runs-on: macos-latest
     needs: create-release
 
     steps:
@@ -133,7 +133,7 @@ jobs:
 
   build-and-publish-maccatalyst:
     name: Build and Publish macOS
-    runs-on: macos-14
+    runs-on: macos-latest
     needs: create-release
 
     steps:

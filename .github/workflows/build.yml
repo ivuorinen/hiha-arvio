@@ -10,7 +10,7 @@ on:
 jobs:
   build-ios:
     name: Build iOS
-    runs-on: macos-14
+    runs-on: macos-latest
 
     steps:
     - name: Checkout code
@@ -41,7 +41,7 @@ jobs:
 
   build-maccatalyst:
     name: Build macOS Catalyst
-    runs-on: macos-14
+    runs-on: macos-latest
 
     steps:
     - name: Checkout code
