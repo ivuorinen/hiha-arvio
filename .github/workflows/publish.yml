@@ -192,9 +192,6 @@ jobs:
           ### Installation
           - **iOS**: Download the `.zip` file, extract, and install via Xcode or TestFlight
           - **macOS**: Download the `.zip` file, extract, and move to Applications folder
-
-          ---
-          🤖 Generated with [Claude Code](https://claude.com/claude-code)
         draft: false
         prerelease: ${{ contains(steps.get_version.outputs.version, 'alpha') || contains(steps.get_version.outputs.version, 'beta') || contains(steps.get_version.outputs.version, 'rc') }}
         files: |

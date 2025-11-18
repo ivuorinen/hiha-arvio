@@ -239,7 +239,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Built with [.NET MAUI](https://dotnet.microsoft.com/apps/maui)
 - MVVM powered by [CommunityToolkit.Mvvm](https://github.com/CommunityToolkit/dotnet)
 - Testing with [xUnit](https://xunit.net/), [FluentAssertions](https://fluentassertions.com/), and [NSubstitute](https://nsubstitute.github.io/)
-- Developed with assistance from [Claude Code](https://claude.com/claude-code)
 
 ## 🎭 Why "HihaArvio"?
 
@@ -257,5 +256,3 @@ Perfect for:
 **Bundle ID**: `net.ivuorinen.HihaArvio`
 **Version**: 1.0
 **Platforms**: iOS 15.0+, macOS 12.0+
-
-🤖 Generated with [Claude Code](https://claude.com/claude-code)
