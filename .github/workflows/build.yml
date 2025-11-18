@@ -11,6 +11,9 @@ jobs:
   build-ios:
     name: Build iOS
     runs-on: macos-latest
+    permissions:
+      contents: read
+      actions: write
 
     steps:
     - name: Checkout code
@@ -39,6 +42,9 @@ jobs:
   build-maccatalyst:
     name: Build macOS Catalyst
     runs-on: macos-latest
+    permissions:
+      contents: read
+      actions: write
 
     steps:
     - name: Checkout code
@@ -69,6 +75,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build-ios, build-maccatalyst]
     if: always()
+    permissions: {}
 
     steps:
     - name: Check build status
