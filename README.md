@@ -8,11 +8,7 @@ A playful Finnish take on agile estimation through shake gestures. Instead of po
 
 ## 🎯 What is HihaArvio?
 
-"Hiha-arvio" literally means "sleeve estimate" in Finnish - those quick, informal estimates you pull out of thin air (or your sleeve) when someone asks "how long will this take?" This app embraces that chaos with a gesture-based estimation tool that responds to how vigorously you shake your device.
-
-**Shake lightly**: Conservative estimates (minutes to hours)
-**Shake vigorously**: Ambitious estimates (days to weeks)
-**Shake like your life depends on it**: Comedy gold ("when hell freezes over", "3 lifetimes", "never")
+"Hiha-arvio" literally means "sleeve estimate" in Finnish - those quick, informal estimates you pull out of thin air (or your sleeve) when someone asks "how long will this take?" This app embraces that chaos with a gesture-based estimation tool. Just shake your device and discover what estimate emerges from your sleeve.
 
 ## ✨ Features
 
@@ -138,13 +134,11 @@ Future platforms:
 ## 🎮 How to Use
 
 1. **Launch the app** on iOS or macOS
-2. **Shake your device**:
-   - Gentle shake → Conservative estimate
-   - Vigorous shake → Ambitious estimate
-   - Crazy shake → Comedic estimate
+2. **Shake your device** to generate an estimate
 3. **View your estimate** displayed prominently
 4. **Check history** to review past sleeve estimates
 5. **Adjust settings** to change estimation mode or history size
+6. **Experiment** with different shake styles and discover what emerges!
 
 ## 🧬 Project Structure
 

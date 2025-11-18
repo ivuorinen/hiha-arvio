@@ -115,3 +115,4 @@ ehthumbs.db
 **/Resource.designer.cs
 **/[Aa]ndroid/**/[Rr]esource.designer.cs
 **/[Ii]OS/**/[Rr]esource.designer.cs
+*.sarif
