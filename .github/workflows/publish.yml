@@ -1,0 +1,204 @@
+name: Publish
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to publish (e.g., 1.0.0)'
+        required: true
+        type: string
+
+env:
+  DOTNET_VERSION: '8.0.x'
+
+jobs:
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+      version: ${{ steps.get_version.outputs.version }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Get version
+      id: get_version
+      run: |
+        if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+          echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+        else
+          echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Generate changelog
+      id: changelog
+      run: |
+        if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+          echo "changelog=Manual release of version ${{ steps.get_version.outputs.version }}" >> $GITHUB_OUTPUT
+        else
+          # Get commits since last tag
+          PREVIOUS_TAG=$(git describe --abbrev=0 --tags $(git rev-list --tags --skip=1 --max-count=1) 2>/dev/null || echo "")
+          if [[ -z "$PREVIOUS_TAG" ]]; then
+            CHANGELOG=$(git log --pretty=format:"- %s (%h)" --no-merges)
+          else
+            CHANGELOG=$(git log ${PREVIOUS_TAG}..HEAD --pretty=format:"- %s (%h)" --no-merges)
+          fi
+          echo "changelog<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGELOG" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.event_name == 'workflow_dispatch' && format('v{0}', github.event.inputs.version) || github.ref }}
+        release_name: Release ${{ steps.get_version.outputs.version }}
+        body: |
+          ## HihaArvio v${{ steps.get_version.outputs.version }}
+
+          Sleeve Estimate - A playful Finnish take on agile estimation through shake gestures.
+
+          ### Changes
+          ${{ steps.changelog.outputs.changelog }}
+
+          ### Supported Platforms
+          - iOS 15.0+
+          - macOS 12.0+ (via Mac Catalyst)
+
+          ### Installation
+          - **iOS**: Download the `.ipa` file and install via Xcode or TestFlight
+          - **macOS**: Download the `.app` bundle and move to Applications folder
+
+          ---
+          🤖 Generated with [Claude Code](https://claude.com/claude-code)
+        draft: false
+        prerelease: ${{ contains(steps.get_version.outputs.version, 'alpha') || contains(steps.get_version.outputs.version, 'beta') || contains(steps.get_version.outputs.version, 'rc') }}
+
+  build-and-publish-ios:
+    name: Build and Publish iOS
+    runs-on: macos-14
+    needs: create-release
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: Install MAUI workload
+      run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
+
+    - name: Restore dependencies
+      run: dotnet restore HihaArvio.sln
+
+    - name: Build iOS Release
+      run: |
+        dotnet publish src/HihaArvio/HihaArvio.csproj \
+          -f net8.0-ios \
+          -c Release \
+          /p:ApplicationDisplayVersion=${{ needs.create-release.outputs.version }} \
+          /p:ApplicationVersion=${{ github.run_number }} \
+          /p:ArchiveOnBuild=false \
+          /p:EnableCodeSigning=false
+
+    - name: Create iOS artifact archive
+      run: |
+        cd src/HihaArvio/bin/Release/net8.0-ios
+        zip -r HihaArvio-iOS-${{ needs.create-release.outputs.version }}.zip *.app
+        mv HihaArvio-iOS-${{ needs.create-release.outputs.version }}.zip ${{ github.workspace }}/
+
+    - name: Upload iOS Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ needs.create-release.outputs.upload_url }}
+        asset_path: ./HihaArvio-iOS-${{ needs.create-release.outputs.version }}.zip
+        asset_name: HihaArvio-iOS-${{ needs.create-release.outputs.version }}.zip
+        asset_content_type: application/zip
+
+  build-and-publish-maccatalyst:
+    name: Build and Publish macOS
+    runs-on: macos-14
+    needs: create-release
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: Install MAUI workload
+      run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
+
+    - name: Restore dependencies
+      run: dotnet restore HihaArvio.sln
+
+    - name: Build macOS Catalyst Release
+      run: |
+        dotnet publish src/HihaArvio/HihaArvio.csproj \
+          -f net8.0-maccatalyst \
+          -c Release \
+          /p:ApplicationDisplayVersion=${{ needs.create-release.outputs.version }} \
+          /p:ApplicationVersion=${{ github.run_number }} \
+          /p:ArchiveOnBuild=false \
+          /p:EnableCodeSigning=false
+
+    - name: Create macOS artifact archive
+      run: |
+        cd src/HihaArvio/bin/Release/net8.0-maccatalyst
+        zip -r HihaArvio-macOS-${{ needs.create-release.outputs.version }}.zip *.app
+        mv HihaArvio-macOS-${{ needs.create-release.outputs.version }}.zip ${{ github.workspace }}/
+
+    - name: Upload macOS Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ needs.create-release.outputs.upload_url }}
+        asset_path: ./HihaArvio-macOS-${{ needs.create-release.outputs.version }}.zip
+        asset_name: HihaArvio-macOS-${{ needs.create-release.outputs.version }}.zip
+        asset_content_type: application/zip
+
+  publish-status:
+    name: Publish Status
+    runs-on: ubuntu-latest
+    needs: [create-release, build-and-publish-ios, build-and-publish-maccatalyst]
+    if: always()
+
+    steps:
+    - name: Check publish status
+      run: |
+        echo "## Release Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "Version: ${{ needs.create-release.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Build Status" >> $GITHUB_STEP_SUMMARY
+        echo "- iOS: ${{ needs.build-and-publish-ios.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "- macOS Catalyst: ${{ needs.build-and-publish-maccatalyst.result }}" >> $GITHUB_STEP_SUMMARY
+
+        if [[ "${{ needs.build-and-publish-ios.result }}" == "success" ]] && [[ "${{ needs.build-and-publish-maccatalyst.result }}" == "success" ]]; then
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ All builds succeeded and artifacts published" >> $GITHUB_STEP_SUMMARY
+          exit 0
+        else
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "❌ One or more builds failed" >> $GITHUB_STEP_SUMMARY
+          exit 1
+        fi
