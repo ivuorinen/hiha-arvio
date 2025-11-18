@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{7228B5C2-A84A-4648-BB86-FF76E090592E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HihaArvio", "src\HihaArvio\HihaArvio.csproj", "{E8438360-C957-4B6B-A7EA-9F910063D141}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{1BA313A1-7BF6-4504-B397-6EFA6B72D5AA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HihaArvio.Tests", "tests\HihaArvio.Tests\HihaArvio.Tests.csproj", "{FCA4D2E3-827F-4557-BBD4-A2F9F81CB158}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E8438360-C957-4B6B-A7EA-9F910063D141}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E8438360-C957-4B6B-A7EA-9F910063D141}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E8438360-C957-4B6B-A7EA-9F910063D141}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E8438360-C957-4B6B-A7EA-9F910063D141}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FCA4D2E3-827F-4557-BBD4-A2F9F81CB158}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FCA4D2E3-827F-4557-BBD4-A2F9F81CB158}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FCA4D2E3-827F-4557-BBD4-A2F9F81CB158}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FCA4D2E3-827F-4557-BBD4-A2F9F81CB158}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{E8438360-C957-4B6B-A7EA-9F910063D141} = {7228B5C2-A84A-4648-BB86-FF76E090592E}
+		{FCA4D2E3-827F-4557-BBD4-A2F9F81CB158} = {1BA313A1-7BF6-4504-B397-6EFA6B72D5AA}
+	EndGlobalSection
+EndGlobal
