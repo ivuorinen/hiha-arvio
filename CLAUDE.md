@@ -197,6 +197,60 @@ HihaArvio.sln
 - Code analysis: StyleCop + built-in analyzers enabled
 - CI/CD must enforce 95% coverage threshold and fail builds below this
 
+## Implementation Status
+
+### Completed Milestones
+
+**Milestone 1: Project Setup & Core Models (✅ Complete)**
+- Solution structure with src/HihaArvio and tests/HihaArvio.Tests
+- Core models: EstimateMode, EstimateResult, ShakeData, AppSettings
+- 48 tests, all passing
+- Build verification: all platforms (net8.0, iOS, macOS)
+
+**Milestone 2: Services Layer (✅ Complete)**
+- IEstimateService + EstimateService (25 tests)
+  - Estimate generation with intensity-based range selection
+  - Easter egg logic (>15s → Humorous mode)
+  - Cryptographically secure RNG
+- IStorageService + StorageService (14 tests)
+  - SQLite-based persistence
+  - Settings and history storage
+  - Auto-pruning based on MaxHistorySize
+- IShakeDetectionService + ShakeDetectionService (22 tests)
+  - Shake detection with 1.5g threshold
+  - Intensity calculation and normalization (0.0-1.0)
+  - Duration tracking
+  - Event-based notification (ShakeDataChanged)
+- Integration tests (10 tests)
+  - Service interaction verification
+  - Full flow: shake → estimate → storage
+- **Total: 119 tests, all passing**
+- **Coverage:** 51.28% line (low due to MAUI template), 87.5% branch
+- **Build:** 0 warnings, 0 errors across all platforms
+
+### Remaining Work
+
+**Milestone 3: ViewModels Layer** (Not Started)
+- MainViewModel (estimate display, settings)
+- HistoryViewModel (estimate history)
+- SettingsViewModel (mode selection, history management)
+
+**Milestone 4: Views/UI Layer** (Not Started)
+- MainPage (shake screen, estimate display)
+- HistoryPage (estimate list)
+- SettingsPage (mode toggle, history clear)
+- Navigation infrastructure
+
+**Milestone 5: Platform-Specific Implementations** (Not Started)
+- IAccelerometerService interface
+- iOS implementation (real accelerometer)
+- Desktop/Web implementation (mouse movement simulation)
+
+**Milestone 6: Integration & Polish** (Not Started)
+- Platform testing
+- Performance optimization
+- Documentation finalization
+
 ## Important Implementation Order
 
 Per design document, phased development:
