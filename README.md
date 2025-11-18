@@ -45,11 +45,11 @@ Built with **.NET 8 MAUI** using modern C# 12 and strict MVVM architecture:
 
 ## 🧪 Testing
 
-**189 tests** covering all layers:
-- **48 tests**: Models layer
-- **71 tests**: Services layer
-- **46 tests**: ViewModels layer
-- **24 tests**: Platform-specific accelerometer implementations
+Comprehensive test suite covering all layers:
+- Models layer
+- Services layer
+- ViewModels layer
+- Platform-specific accelerometer implementations
 
 ```bash
 # Run all tests
@@ -106,7 +106,7 @@ Three automated workflows handle testing, building, and publishing:
 
 ### 🧪 Test Workflow
 - Runs on every push/PR to `main` or `develop`
-- Executes all 189 tests on Ubuntu runner
+- Executes complete test suite on Ubuntu runner
 - Publishes test results and artifacts
 
 ### 🏗️ Build Workflow
