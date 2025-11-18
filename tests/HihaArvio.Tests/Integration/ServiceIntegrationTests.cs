@@ -13,6 +13,7 @@ public class ServiceIntegrationTests : IDisposable
     private readonly IEstimateService _estimateService;
     private readonly IStorageService _storageService;
     private readonly IShakeDetectionService _shakeDetectionService;
+    private readonly IAccelerometerService _accelerometerService;
     private readonly string _testDbPath;
 
     public ServiceIntegrationTests()
@@ -20,7 +21,8 @@ public class ServiceIntegrationTests : IDisposable
         _estimateService = new EstimateService();
         _testDbPath = Path.Combine(Path.GetTempPath(), $"test_integration_{Guid.NewGuid()}.db");
         _storageService = new StorageService(_testDbPath);
-        _shakeDetectionService = new ShakeDetectionService();
+        _accelerometerService = new DesktopAccelerometerService();
+        _shakeDetectionService = new ShakeDetectionService(_accelerometerService);
     }
 
     public void Dispose()

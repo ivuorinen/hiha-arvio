@@ -2,16 +2,19 @@ using FluentAssertions;
 using HihaArvio.Models;
 using HihaArvio.Services;
 using HihaArvio.Services.Interfaces;
+using NSubstitute;
 
 namespace HihaArvio.Tests.Services;
 
 public class ShakeDetectionServiceTests
 {
+    private readonly IAccelerometerService _mockAccelerometer;
     private readonly IShakeDetectionService _service;
 
     public ShakeDetectionServiceTests()
     {
-        _service = new ShakeDetectionService();
+        _mockAccelerometer = Substitute.For<IAccelerometerService>();
+        _service = new ShakeDetectionService(_mockAccelerometer);
     }
 
     #region Initialization and State Tests

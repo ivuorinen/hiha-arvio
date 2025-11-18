@@ -24,6 +24,14 @@ public static class MauiProgram
 
 		// Register Services
 		builder.Services.AddSingleton<IEstimateService, EstimateService>();
+
+		// Platform-specific accelerometer service
+#if IOS || MACCATALYST
+		builder.Services.AddSingleton<IAccelerometerService, IosAccelerometerService>();
+#else
+		builder.Services.AddSingleton<IAccelerometerService, DesktopAccelerometerService>();
+#endif
+
 		builder.Services.AddSingleton<IShakeDetectionService, ShakeDetectionService>();
 
 		// Storage service with app data path

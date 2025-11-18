@@ -18,13 +18,16 @@ public class ShakeDetectionService : IShakeDetectionService
     // Gravity constant (at rest, device experiences 1g)
     private const double GravityG = 1.0;
 
+    private readonly IAccelerometerService _accelerometerService;
     private ShakeData _currentShakeData;
     private bool _isMonitoring;
     private DateTimeOffset _shakeStartTime;
     private bool _wasShakingLastUpdate;
 
-    public ShakeDetectionService()
+    public ShakeDetectionService(IAccelerometerService accelerometerService)
     {
+        _accelerometerService = accelerometerService ?? throw new ArgumentNullException(nameof(accelerometerService));
+
         _currentShakeData = new ShakeData
         {
             IsShaking = false,
@@ -47,13 +50,36 @@ public class ShakeDetectionService : IShakeDetectionService
     /// <inheritdoc/>
     public void StartMonitoring()
     {
+        if (_isMonitoring)
+        {
+            return; // Already monitoring
+        }
+
         _isMonitoring = true;
+
+        // Subscribe to accelerometer events
+        _accelerometerService.ReadingChanged += OnAccelerometerReadingChanged;
+        _accelerometerService.Start();
     }
 
     /// <inheritdoc/>
     public void StopMonitoring()
     {
+        if (!_isMonitoring)
+        {
+            return; // Already stopped
+        }
+
         _isMonitoring = false;
+
+        // Unsubscribe from accelerometer events
+        _accelerometerService.ReadingChanged -= OnAccelerometerReadingChanged;
+        _accelerometerService.Stop();
+    }
+
+    private void OnAccelerometerReadingChanged(object? sender, SensorReading reading)
+    {
+        ProcessAccelerometerReading(reading.X, reading.Y, reading.Z);
     }
 
     /// <inheritdoc/>

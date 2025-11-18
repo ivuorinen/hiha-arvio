@@ -282,12 +282,31 @@ HihaArvio.sln
 - **Total: 165 tests still passing (no UI tests yet)**
 - **Build:** 0 warnings, 0 errors across all platforms (net8.0, iOS, macOS Catalyst)
 
-### Remaining Work
-
-**Milestone 5: Platform-Specific Implementations** (Not Started)
+**Milestone 5: Platform-Specific Implementations (✅ Complete)**
 - IAccelerometerService interface
-- iOS implementation (real accelerometer)
-- Desktop/Web implementation (mouse movement simulation)
+  - Platform-agnostic abstraction for sensor input
+  - SensorReading model for accelerometer data (X, Y, Z in g's)
+  - ReadingChanged event for continuous data stream
+- IosAccelerometerService (10 tests)
+  - Uses MAUI's built-in Accelerometer API
+  - Works on iOS devices and simulator
+  - Conditional compilation for iOS/macOS Catalyst
+- DesktopAccelerometerService (11 tests)
+  - Simulated accelerometer using timer-based readings
+  - Generates realistic sensor noise (~60Hz refresh rate)
+  - Includes SimulateShake() for manual testing
+- ShakeDetectionService integration
+  - Now accepts IAccelerometerService via DI
+  - Auto-subscribes to sensor readings on StartMonitoring
+  - Processes readings through existing shake algorithm
+- Platform-specific DI in MauiProgram.cs
+  - iOS/macOS Catalyst: IosAccelerometerService
+  - Desktop/other: DesktopAccelerometerService
+  - Uses conditional compilation (#if IOS || MACCATALYST)
+- **Total: 189 tests passing (165 previous + 24 accelerometer)**
+- **Build:** 0 warnings, 0 errors across all platforms
+
+### Remaining Work
 
 **Milestone 6: Integration & Polish** (Not Started)
 - Platform testing
