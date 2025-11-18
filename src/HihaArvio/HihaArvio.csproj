@@ -28,7 +28,7 @@
 		<ApplicationTitle>HihaArvio</ApplicationTitle>
 
 		<!-- App Identifier -->
-		<ApplicationId>com.companyname.hihaarvio</ApplicationId>
+		<ApplicationId>net.ivuorinen.HihaArvio</ApplicationId>
 
 		<!-- Versions -->
 		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
