@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:HihaArvio.ViewModels"
+             xmlns:models="clr-namespace:HihaArvio.Models"
+             x:Class="HihaArvio.HistoryPage"
+             x:DataType="viewmodels:HistoryViewModel"
+             Title="History">
+
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- Toolbar -->
+        <HorizontalStackLayout Grid.Row="0" Padding="15" Spacing="10">
+            <Button Text="Refresh"
+                    Command="{Binding LoadHistoryCommand}"
+                    HorizontalOptions="FillAndExpand"/>
+            <Button Text="Clear All"
+                    Command="{Binding ClearHistoryCommand}"
+                    BackgroundColor="{StaticResource Danger}"
+                    HorizontalOptions="FillAndExpand"/>
+        </HorizontalStackLayout>
+
+        <!-- Empty State -->
+        <VerticalStackLayout Grid.Row="1"
+                             IsVisible="{Binding IsEmpty}"
+                             VerticalOptions="Center"
+                             HorizontalOptions="Center"
+                             Padding="20">
+            <Label Text="No history yet"
+                   FontSize="24"
+                   FontAttributes="Bold"
+                   HorizontalTextAlignment="Center"
+                   TextColor="{StaticResource Gray600}"/>
+            <Label Text="Shake your device to generate estimates"
+                   FontSize="16"
+                   HorizontalTextAlignment="Center"
+                   TextColor="{StaticResource Gray500}"
+                   Margin="0,10,0,0"/>
+        </VerticalStackLayout>
+
+        <!-- History List -->
+        <CollectionView Grid.Row="1"
+                        ItemsSource="{Binding History}"
+                        IsVisible="{Binding IsEmpty, Converter={StaticResource InvertedBoolConverter}}"
+                        Margin="10">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:EstimateResult">
+                    <Frame Padding="15" Margin="5" HasShadow="True">
+                        <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,Auto" RowSpacing="8">
+
+                            <!-- Estimate Text -->
+                            <Label Grid.Row="0" Grid.Column="0"
+                                   Text="{Binding EstimateText}"
+                                   FontSize="24"
+                                   FontAttributes="Bold"
+                                   TextColor="{StaticResource Primary}"/>
+
+                            <!-- Mode Badge -->
+                            <Frame Grid.Row="0" Grid.Column="1"
+                                   Padding="8,4"
+                                   BackgroundColor="{StaticResource Secondary}"
+                                   CornerRadius="12"
+                                   HasShadow="False">
+                                <Label Text="{Binding Mode}"
+                                       FontSize="12"
+                                       TextColor="White"/>
+                            </Frame>
+
+                            <!-- Timestamp -->
+                            <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                                   Text="{Binding Timestamp, StringFormat='{0:MMM d, yyyy h:mm tt}'}"
+                                   FontSize="14"
+                                   TextColor="{StaticResource Gray600}"/>
+
+                            <!-- Shake Details -->
+                            <Label Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                                   FontSize="12"
+                                   TextColor="{StaticResource Gray500}">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="Intensity: "/>
+                                        <Span Text="{Binding ShakeIntensity, StringFormat='{0:P0}'}" FontAttributes="Bold"/>
+                                        <Span Text=" | Duration: "/>
+                                        <Span Text="{Binding ShakeDuration, StringFormat='{0:0.0}s'}" FontAttributes="Bold"/>
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                        </Grid>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+    </Grid>
+
+</ContentPage>

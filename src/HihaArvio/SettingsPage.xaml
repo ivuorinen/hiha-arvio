@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:HihaArvio.ViewModels"
+             xmlns:models="clr-namespace:HihaArvio.Models"
+             x:Class="HihaArvio.SettingsPage"
+             x:DataType="viewmodels:SettingsViewModel"
+             Title="Settings">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="20">
+
+            <!-- Estimation Mode Section -->
+            <Frame BorderColor="{StaticResource Primary}" Padding="15">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Estimation Mode"
+                           FontSize="20"
+                           FontAttributes="Bold"/>
+                    <Label Text="Choose the type of estimates you want to generate"
+                           FontSize="14"
+                           TextColor="{StaticResource Gray600}"
+                           Margin="0,0,0,10"/>
+
+                    <Picker SelectedItem="{Binding SelectedMode}">
+                        <Picker.ItemsSource>
+                            <x:Array Type="{x:Type models:EstimateMode}">
+                                <models:EstimateMode>Work</models:EstimateMode>
+                                <models:EstimateMode>Generic</models:EstimateMode>
+                            </x:Array>
+                        </Picker.ItemsSource>
+                    </Picker>
+
+                    <Label FontSize="12" TextColor="{StaticResource Gray500}" Margin="0,5,0,0">
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span Text="Work" FontAttributes="Bold"/>
+                                <Span Text=": Project and task estimates (hours, days, weeks)"/><Span Text="&#10;"/>
+                                <Span Text="Generic" FontAttributes="Bold"/>
+                                <Span Text=": General time durations (minutes, hours)"/>
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- History Settings Section -->
+            <Frame BorderColor="{StaticResource Primary}" Padding="15">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="History Settings"
+                           FontSize="20"
+                           FontAttributes="Bold"/>
+                    <Label Text="Maximum number of estimates to keep in history"
+                           FontSize="14"
+                           TextColor="{StaticResource Gray600}"
+                           Margin="0,0,0,10"/>
+
+                    <HorizontalStackLayout Spacing="15">
+                        <Label Text="Max History Size:"
+                               VerticalOptions="Center"
+                               FontSize="16"/>
+                        <Stepper Value="{Binding MaxHistorySize}"
+                                 Minimum="5"
+                                 Maximum="100"
+                                 Increment="5"
+                                 VerticalOptions="Center"/>
+                        <Label Text="{Binding MaxHistorySize}"
+                               VerticalOptions="Center"
+                               FontSize="18"
+                               FontAttributes="Bold"
+                               TextColor="{StaticResource Primary}"/>
+                    </HorizontalStackLayout>
+
+                    <Label Text="Older estimates will be automatically removed when this limit is reached"
+                           FontSize="12"
+                           TextColor="{StaticResource Gray500}"
+                           Margin="0,10,0,0"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Save Button -->
+            <Button Text="Save Settings"
+                    Command="{Binding SaveSettingsCommand}"
+                    FontSize="18"
+                    Padding="15"
+                    Margin="0,10,0,0"/>
+
+            <!-- Info Section -->
+            <Frame BorderColor="{StaticResource Secondary}" Padding="15" Margin="0,20,0,0">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="About Hiha-Arvio"
+                           FontSize="18"
+                           FontAttributes="Bold"/>
+                    <Label FontSize="14" TextColor="{StaticResource Gray600}">
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span Text="Hiha-Arvio ("/>
+                                <Span Text="Sleeve Estimate" FontAttributes="Italic"/>
+                                <Span Text=") generates semi-random time estimates based on shake intensity. Perfect for those moments when you need to pull an estimate from your sleeve!"/>
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
+                    <Label Text="Easter Egg: Try shaking for more than 15 seconds..."
+                           FontSize="12"
+                           TextColor="{StaticResource Gray500}"
+                           FontAttributes="Italic"
+                           Margin="0,10,0,0"/>
+                </VerticalStackLayout>
+            </Frame>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

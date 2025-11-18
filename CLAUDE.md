@@ -228,18 +228,61 @@ HihaArvio.sln
 - **Coverage:** 51.28% line (low due to MAUI template), 87.5% branch
 - **Build:** 0 warnings, 0 errors across all platforms
 
+**Milestone 3: ViewModels Layer (✅ Complete)**
+- MainViewModel (18 tests)
+  - Coordinates shake detection and estimate generation
+  - Subscribes to ShakeDetectionService.ShakeDataChanged event
+  - Detects shake stop (transition from shaking → not shaking)
+  - Mode selection and current estimate display
+  - Implements IDisposable for cleanup
+- HistoryViewModel (15 tests)
+  - Manages estimate history display with ObservableCollection
+  - LoadHistoryCommand for async history retrieval
+  - ClearHistoryCommand for pruning
+  - IsEmpty property for empty state handling
+- SettingsViewModel (13 tests)
+  - Settings management (SelectedMode, MaxHistorySize)
+  - SaveSettingsCommand for persistence
+  - Auto-loads settings on initialization
+- All ViewModels use CommunityToolkit.Mvvm source generators
+  - [ObservableProperty] for property change notifications
+  - [RelayCommand] for commands
+- **Total: 165 tests, all passing (119 services + 46 ViewModels)**
+- **Build:** 0 warnings, 0 errors across all platforms
+
+**Milestone 4: Views/UI Layer (✅ Complete)**
+- Dependency Injection configuration in MauiProgram.cs
+  - All services registered as Singleton
+  - All ViewModels and Pages registered as Transient
+  - SQLite database path configured with FileSystem.AppDataDirectory
+- MainPage.xaml with data binding
+  - Mode selector (Work/Generic)
+  - Current estimate display with conditional visibility
+  - Shake status indicator
+  - Uses x:DataType for compile-time binding verification
+- HistoryPage.xaml with data binding
+  - CollectionView with ItemTemplate
+  - Empty state when no history
+  - Refresh and Clear All buttons
+  - Auto-loads history on OnAppearing()
+- SettingsPage.xaml with data binding
+  - Picker for mode selection (Work/Generic only - Humorous is easter egg)
+  - Stepper for MaxHistorySize (5-100, increment by 5)
+  - Save Settings button
+  - About section with easter egg hint
+- Value Converters for UI logic
+  - IsNullConverter / IsNotNullConverter (conditional visibility)
+  - BoolToShakingConverter (status text)
+  - BoolToColorConverter (status colors)
+  - InvertedBoolConverter (boolean inversion)
+  - All registered in App.xaml resources
+- AppShell.xaml navigation
+  - TabBar with 3 tabs: Estimate, History, Settings
+  - Each tab uses ContentTemplate for lazy loading
+- **Total: 165 tests still passing (no UI tests yet)**
+- **Build:** 0 warnings, 0 errors across all platforms (net8.0, iOS, macOS Catalyst)
+
 ### Remaining Work
-
-**Milestone 3: ViewModels Layer** (Not Started)
-- MainViewModel (estimate display, settings)
-- HistoryViewModel (estimate history)
-- SettingsViewModel (mode selection, history management)
-
-**Milestone 4: Views/UI Layer** (Not Started)
-- MainPage (shake screen, estimate display)
-- HistoryPage (estimate list)
-- SettingsPage (mode toggle, history clear)
-- Navigation infrastructure
 
 **Milestone 5: Platform-Specific Implementations** (Not Started)
 - IAccelerometerService interface
