@@ -28,5 +28,7 @@
 	</array>
 	<key>XSAppIconAssets</key>
 	<string>Assets.xcassets/appicon.appiconset</string>
+	<key>NSMotionUsageDescription</key>
+	<string>HihaArvio needs access to motion sensors to detect shake gestures for generating time estimates.</string>
 </dict>
 </plist>

@@ -30,8 +30,37 @@ jobs:
     - name: Build test project
       run: dotnet build tests/HihaArvio.Tests/HihaArvio.Tests.csproj --configuration Release --no-restore /p:TargetFrameworks=net8.0
 
-    - name: Run tests
-      run: dotnet test tests/HihaArvio.Tests/HihaArvio.Tests.csproj --configuration Release --no-build --verbosity normal /p:TargetFrameworks=net8.0 --logger "trx;LogFileName=test-results.trx"
+    - name: Run tests with coverage
+      run: dotnet test tests/HihaArvio.Tests/HihaArvio.Tests.csproj --configuration Release --no-build --verbosity normal /p:TargetFrameworks=net8.0 --collect:"XPlat Code Coverage" --logger "trx;LogFileName=test-results.trx"
+
+    - name: Install ReportGenerator
+      run: dotnet tool install --global dotnet-reportgenerator-globaltool
+
+    - name: Generate coverage report
+      run: reportgenerator -reports:**/coverage.cobertura.xml -targetdir:coverage -reporttypes:"Html;Cobertura;TextSummary"
+
+    - name: Check coverage threshold
+      run: |
+        # Extract line coverage percentage from coverage report
+        COVERAGE=$(grep -oP 'Line coverage: \K[\d.]+' coverage/Summary.txt | head -1)
+        echo "Code coverage: ${COVERAGE}%"
+
+        # Per spec: Enforce 95% minimum coverage
+        THRESHOLD=95.0
+        if (( $(echo "$COVERAGE < $THRESHOLD" | bc -l) )); then
+          echo "❌ Coverage ${COVERAGE}% is below required threshold of ${THRESHOLD}%"
+          exit 1
+        else
+          echo "✅ Coverage ${COVERAGE}% meets or exceeds required threshold of ${THRESHOLD}%"
+        fi
+
+    - name: Upload coverage report
+      uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+      if: always()
+      with:
+        name: coverage-report
+        path: coverage/
+        retention-days: 30
 
     - name: Publish test results
       uses: dorny/test-reporter@dc3a92680fcc15842eef52e8c4606ea7ce6bd3f3 # v2.1.1
