@@ -24,6 +24,11 @@ jobs:
       with:
         dotnet-version: '9.0.x'
 
+    - name: Select Xcode version
+      uses: maxim-lobanov/setup-xcode@60606e260d2fc5762a71e64e74b2174e8ea3c8bd # v1.6.0
+      with:
+        xcode-version: '26.0'
+
     - name: Restore workloads
       run: dotnet workload restore src/HihaArvio/HihaArvio.csproj
 
@@ -54,6 +59,11 @@ jobs:
       uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7 # v5.2.0
       with:
         dotnet-version: '9.0.x'
+
+    - name: Select Xcode version
+      uses: maxim-lobanov/setup-xcode@60606e260d2fc5762a71e64e74b2174e8ea3c8bd # v1.6.0
+      with:
+        xcode-version: '26.0'
 
     - name: Restore workloads
       run: dotnet workload restore src/HihaArvio/HihaArvio.csproj
