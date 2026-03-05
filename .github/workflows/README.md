@@ -32,8 +32,8 @@ This directory contains the CI/CD workflows for HihaArvio.
 **Purpose**: Build the application for all supported platforms.
 
 **What it does**:
-- **iOS Job**: Builds for iOS 15.0+ on macOS-14 runner
-- **macOS Catalyst Job**: Builds for macOS 12.0+ on macOS-14 runner
+- **iOS Job**: Builds for iOS 15.0+ on macOS-26 runner
+- **macOS Catalyst Job**: Builds for macOS 12.0+ on macOS-26 runner
 - Installs .NET MAUI workload
 - Builds without code signing (for CI verification)
 - Uploads build artifacts (`.app` bundles)
@@ -146,8 +146,8 @@ For signed releases, add:
 
 ### Runner Requirements
 - **Test**: `ubuntu-latest` (any Linux runner)
-- **Build**: `macos-14` (Apple Silicon runner for MAUI workloads)
-- **Publish**: `macos-14` (Apple Silicon runner for MAUI workloads)
+- **Build**: `macos-26` (Apple Silicon runner with Xcode 26 for MAUI workloads)
+- **Publish**: `macos-26` (Apple Silicon runner with Xcode 26 for MAUI workloads)
 
 ### External Actions Used
 - `actions/checkout@v6.0.2` - Checkout repository
