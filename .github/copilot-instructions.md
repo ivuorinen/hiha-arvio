@@ -10,7 +10,7 @@ Before suggesting, generating, or reviewing any code for this repository, read a
 
 ## Non-Negotiable Rules
 
-The following rules come directly from CLAUDE.md and MUST be enforced in every interaction:
+The following rules are derived from CLAUDE.md and additional Copilot-specific code quality guidelines. All MUST be enforced in every interaction:
 
 ### Language & Framework
 
@@ -35,7 +35,7 @@ The following rules come directly from CLAUDE.md and MUST be enforced in every i
 
 ### Testing Requirements
 
-- Test coverage MUST be ≥ 95 % (enforced by Coverlet in CI/CD)
+- Test coverage MUST be ≥ 95 % (measured by Coverlet; threshold enforcement is a future CI/CD enhancement)
 - Testing stack: **xUnit + NSubstitute + FluentAssertions**
 - All tests MUST use deterministic, seeded randomness — never `Random.Shared`
 - All external dependencies (sensors, database, file system) MUST be mocked
@@ -86,7 +86,7 @@ The following rules come directly from CLAUDE.md and MUST be enforced in every i
 
 ## Easter Egg — Never Expose
 
-The hidden humorous mode triggered by shaking for > 15 seconds MUST NOT be mentioned in any UI element, setting, or documentation visible to users. It is an undocumented feature only.
+The hidden humorous mode triggered by shaking for > 15 seconds MUST NOT have any visible UI indication and MUST NOT be mentioned in any UI element, setting, or documentation visible to users.
 
 ## When in Doubt
 

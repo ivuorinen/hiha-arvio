@@ -53,13 +53,13 @@ Comprehensive test suite covering all layers:
 
 ```bash
 # Run all tests
-dotnet test HihaArvio.sln -f net9.0
+dotnet test tests/HihaArvio.Tests/HihaArvio.Tests.csproj -f net9.0
 
 # Run with detailed output
-dotnet test HihaArvio.sln -f net9.0 --verbosity detailed
+dotnet test tests/HihaArvio.Tests/HihaArvio.Tests.csproj -f net9.0 --verbosity detailed
 
 # Generate coverage report
-dotnet test HihaArvio.sln -f net9.0 --collect:"XPlat Code Coverage"
+dotnet test tests/HihaArvio.Tests/HihaArvio.Tests.csproj -f net9.0 --collect:"XPlat Code Coverage"
 ```
 
 ## 🚀 Getting Started
@@ -85,7 +85,7 @@ dotnet restore HihaArvio.sln
 dotnet build HihaArvio.sln -c Release
 
 # Run tests
-dotnet test HihaArvio.sln -f net9.0
+dotnet test tests/HihaArvio.Tests/HihaArvio.Tests.csproj -f net9.0
 ```
 
 ### Running the App

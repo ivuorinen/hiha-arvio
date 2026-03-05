@@ -13,8 +13,8 @@ This directory contains the CI/CD workflows for HihaArvio.
 **What it does**:
 - Runs on Ubuntu (fastest, cheapest for tests)
 - Sets up .NET 9.0
-- Builds the solution for `net9.0` target
-- Runs all 193 xUnit tests
+- Restores and builds `tests/HihaArvio.Tests/HihaArvio.Tests.csproj` for the `net9.0` target
+- Runs all xUnit tests in `tests/HihaArvio.Tests/HihaArvio.Tests.csproj`
 - Publishes test results and coverage reports
 - Uploads test artifacts for review
 
@@ -98,7 +98,7 @@ Tags containing `alpha`, `beta`, or `rc` are marked as pre-releases.
 
 ### Running Tests Locally
 ```bash
-dotnet test HihaArvio.sln -f net9.0
+dotnet test tests/HihaArvio.Tests/HihaArvio.Tests.csproj -f net9.0
 ```
 
 ### Building Locally
@@ -164,7 +164,7 @@ For signed releases, add:
 ### Tests Failing
 Check test output in workflow logs. Run locally with:
 ```bash
-dotnet test HihaArvio.sln -f net9.0 --verbosity detailed
+dotnet test tests/HihaArvio.Tests/HihaArvio.Tests.csproj -f net9.0 --verbosity detailed
 ```
 
 ### Build Failing
