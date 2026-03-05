@@ -12,7 +12,7 @@ on:
         type: string
 
 env:
-  DOTNET_VERSION: '8.0.x'
+  DOTNET_VERSION: '9.0.x'
 
 jobs:
   build-ios:
@@ -24,7 +24,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
     - name: Get version
       id: get_version
@@ -36,7 +36,7 @@ jobs:
         fi
 
     - name: Setup .NET
-      uses: actions/setup-dotnet@d4c94342e560b34958eacfc5d055d21461ed1c5d # v5.0.0
+      uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7 # v5.2.0
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
 
@@ -46,7 +46,7 @@ jobs:
     - name: Build iOS Release
       run: |
         dotnet publish src/HihaArvio/HihaArvio.csproj \
-          -f net8.0-ios \
+          -f net9.0-ios \
           -c Release \
           /p:ApplicationDisplayVersion=${{ steps.get_version.outputs.version }} \
           /p:ApplicationVersion=${{ github.run_number }} \
@@ -55,7 +55,7 @@ jobs:
 
     - name: Create iOS artifact archive
       run: |
-        cd src/HihaArvio/bin/Release/net8.0-ios
+        cd src/HihaArvio/bin/Release/net9.0-ios
         # Find the .app bundle (it's in a subdirectory like iossimulator-arm64 or ios-arm64)
         APP_PATH=$(find . -name "*.app" -type d | head -n 1)
         if [ -z "$APP_PATH" ]; then
@@ -66,7 +66,7 @@ jobs:
         mv HihaArvio-iOS-${{ steps.get_version.outputs.version }}.zip ${{ github.workspace }}/
 
     - name: Upload iOS artifact
-      uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
       with:
         name: ios-release
         path: HihaArvio-iOS-${{ steps.get_version.outputs.version }}.zip
@@ -81,7 +81,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
     - name: Get version
       id: get_version
@@ -93,7 +93,7 @@ jobs:
         fi
 
     - name: Setup .NET
-      uses: actions/setup-dotnet@d4c94342e560b34958eacfc5d055d21461ed1c5d # v5.0.0
+      uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7 # v5.2.0
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
 
@@ -103,7 +103,7 @@ jobs:
     - name: Build macOS Catalyst Release
       run: |
         dotnet publish src/HihaArvio/HihaArvio.csproj \
-          -f net8.0-maccatalyst \
+          -f net9.0-maccatalyst \
           -c Release \
           /p:ApplicationDisplayVersion=${{ steps.get_version.outputs.version }} \
           /p:ApplicationVersion=${{ github.run_number }} \
@@ -112,7 +112,7 @@ jobs:
 
     - name: Create macOS artifact archive
       run: |
-        cd src/HihaArvio/bin/Release/net8.0-maccatalyst
+        cd src/HihaArvio/bin/Release/net9.0-maccatalyst
         # Find the .app bundle (it's in a subdirectory like maccatalyst-x64 or maccatalyst-arm64)
         APP_PATH=$(find . -name "*.app" -type d | head -n 1)
         if [ -z "$APP_PATH" ]; then
@@ -123,7 +123,7 @@ jobs:
         mv HihaArvio-macOS-${{ steps.get_version.outputs.version }}.zip ${{ github.workspace }}/
 
     - name: Upload macOS artifact
-      uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
       with:
         name: maccatalyst-release
         path: HihaArvio-macOS-${{ steps.get_version.outputs.version }}.zip
@@ -140,7 +140,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       with:
         fetch-depth: 0
 
@@ -172,17 +172,17 @@ jobs:
         fi
 
     - name: Download iOS artifact
-      uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
+      uses: actions/download-artifact@70fc10c6e5e1ce46ad2ea6f2b72d43f7d47b13c3 # v8.0.0
       with:
         name: ios-release
 
     - name: Download macOS artifact
-      uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
+      uses: actions/download-artifact@70fc10c6e5e1ce46ad2ea6f2b72d43f7d47b13c3 # v8.0.0
       with:
         name: maccatalyst-release
 
     - name: Create Release
-      uses: softprops/action-gh-release@5be0e66d93ac7ed76da52eca8bb058f665c3a5fe # v2.4.2
+      uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b # v2.5.0
       with:
         tag_name: ${{ github.event_name == 'workflow_dispatch' && format('v{0}', github.event.inputs.version) || github.ref_name }}
         name: Release ${{ steps.get_version.outputs.version }}

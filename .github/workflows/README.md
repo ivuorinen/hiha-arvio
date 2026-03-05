@@ -12,9 +12,9 @@ This directory contains the CI/CD workflows for HihaArvio.
 
 **What it does**:
 - Runs on Ubuntu (fastest, cheapest for tests)
-- Sets up .NET 8.0
-- Builds the solution for `net8.0` target
-- Runs all 189 xUnit tests
+- Sets up .NET 9.0
+- Builds the solution for `net9.0` target
+- Runs all 193 xUnit tests
 - Publishes test results and coverage reports
 - Uploads test artifacts for review
 
@@ -98,16 +98,16 @@ Tags containing `alpha`, `beta`, or `rc` are marked as pre-releases.
 
 ### Running Tests Locally
 ```bash
-dotnet test HihaArvio.sln -f net8.0
+dotnet test HihaArvio.sln -f net9.0
 ```
 
 ### Building Locally
 ```bash
 # iOS
-dotnet build src/HihaArvio/HihaArvio.csproj -f net8.0-ios -c Release
+dotnet build src/HihaArvio/HihaArvio.csproj -f net9.0-ios -c Release
 
 # macOS Catalyst
-dotnet build src/HihaArvio/HihaArvio.csproj -f net8.0-maccatalyst -c Release
+dotnet build src/HihaArvio/HihaArvio.csproj -f net9.0-maccatalyst -c Release
 ```
 
 ### Creating a Release
@@ -150,12 +150,12 @@ For signed releases, add:
 - **Publish**: `macos-14` (Apple Silicon runner for MAUI workloads)
 
 ### External Actions Used
-- `actions/checkout@v4` - Checkout repository
-- `actions/setup-dotnet@v4` - Setup .NET SDK
-- `actions/upload-artifact@v4` - Upload build artifacts
-- `actions/create-release@v1` - Create GitHub releases
-- `actions/upload-release-asset@v1` - Upload release assets
-- `dorny/test-reporter@v1` - Generate test reports
+- `actions/checkout@v6.0.2` - Checkout repository
+- `actions/setup-dotnet@v5.2.0` - Setup .NET SDK
+- `actions/upload-artifact@v7.0.0` - Upload build artifacts
+- `softprops/action-gh-release@v2.5.0` - Create GitHub releases
+- `actions/download-artifact@v8.0.0` - Download build artifacts for release
+- `dorny/test-reporter@v2.6.0` - Generate test reports
 
 ---
 
@@ -164,7 +164,7 @@ For signed releases, add:
 ### Tests Failing
 Check test output in workflow logs. Run locally with:
 ```bash
-dotnet test HihaArvio.sln -f net8.0 --verbosity detailed
+dotnet test HihaArvio.sln -f net9.0 --verbosity detailed
 ```
 
 ### Build Failing

@@ -24,7 +24,7 @@ A playful Finnish take on agile estimation through shake gestures. Instead of po
 
 ## 🏗️ Architecture
 
-Built with **.NET 8 MAUI** using modern C# 12 and strict MVVM architecture:
+Built with **.NET 9 MAUI** using modern C# 13 and strict MVVM architecture:
 
 - **Models**: Core domain models (EstimateResult, ShakeData, AppSettings)
 - **Services**: Business logic layer
@@ -37,7 +37,7 @@ Built with **.NET 8 MAUI** using modern C# 12 and strict MVVM architecture:
 
 ### Technology Stack
 
-- **.NET 8.0** with C# 12
+- **.NET 9.0** with C# 13
 - **MAUI** for cross-platform UI
 - **CommunityToolkit.Mvvm** for MVVM patterns
 - **SQLite** (sqlite-net-pcl) for local storage
@@ -53,20 +53,20 @@ Comprehensive test suite covering all layers:
 
 ```bash
 # Run all tests
-dotnet test HihaArvio.sln -f net8.0
+dotnet test HihaArvio.sln -f net9.0
 
 # Run with detailed output
-dotnet test HihaArvio.sln -f net8.0 --verbosity detailed
+dotnet test HihaArvio.sln -f net9.0 --verbosity detailed
 
 # Generate coverage report
-dotnet test HihaArvio.sln -f net8.0 --collect:"XPlat Code Coverage"
+dotnet test HihaArvio.sln -f net9.0 --collect:"XPlat Code Coverage"
 ```
 
 ## 🚀 Getting Started
 
 ### Prerequisites
 
-- **.NET 8 SDK**: [Download here](https://dotnet.microsoft.com/download/dotnet/8.0)
+- **.NET 9 SDK**: [Download here](https://dotnet.microsoft.com/download/dotnet/9.0)
 - **MAUI Workload**: Install via `dotnet workload install maui`
 - **Xcode 15+**: Required for iOS/macOS builds (macOS only)
 - **Visual Studio 2022** or **VS Code** with C# extension
@@ -85,19 +85,19 @@ dotnet restore HihaArvio.sln
 dotnet build HihaArvio.sln -c Release
 
 # Run tests
-dotnet test HihaArvio.sln -f net8.0
+dotnet test HihaArvio.sln -f net9.0
 ```
 
 ### Running the App
 
 ```bash
 # iOS Simulator
-dotnet build src/HihaArvio/HihaArvio.csproj -f net8.0-ios -c Debug
+dotnet build src/HihaArvio/HihaArvio.csproj -f net9.0-ios -c Debug
 # Then deploy via Xcode or Visual Studio
 
 # macOS Catalyst
-dotnet build src/HihaArvio/HihaArvio.csproj -f net8.0-maccatalyst -c Debug
-# Then run the .app bundle from bin/Debug/net8.0-maccatalyst/
+dotnet build src/HihaArvio/HihaArvio.csproj -f net9.0-maccatalyst -c Debug
+# Then run the .app bundle from bin/Debug/net9.0-maccatalyst/
 ```
 
 ## 📦 CI/CD Workflows
@@ -174,20 +174,20 @@ hiha-arvio/
 - ✅ **MVVM architecture** strictly followed
 - ✅ **Dependency injection** throughout
 - ✅ **Nullable reference types** enabled
-- ✅ **C# 12** with modern language features
+- ✅ **C# 13** with modern language features
 
 ### Building for Release
 
 ```bash
 # iOS
 dotnet publish src/HihaArvio/HihaArvio.csproj \
-  -f net8.0-ios \
+  -f net9.0-ios \
   -c Release \
   /p:ArchiveOnBuild=true
 
 # macOS Catalyst
 dotnet publish src/HihaArvio/HihaArvio.csproj \
-  -f net8.0-maccatalyst \
+  -f net9.0-maccatalyst \
   -c Release \
   /p:ArchiveOnBuild=true
 ```
