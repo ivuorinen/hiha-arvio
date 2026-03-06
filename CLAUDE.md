@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Hiha-Arvio (Finnish: "Sleeve Estimate") is a .NET 8 MAUI cross-platform application that generates semi-random time estimates based on physical shake input (accelerometer on mobile, mouse movement on desktop). This is a humor app for "pulling an estimate from your sleeve."
+Hiha-Arvio (Finnish: "Sleeve Estimate") is a .NET 9 MAUI cross-platform application that generates semi-random time estimates based on physical shake input (accelerometer on mobile, mouse movement on desktop). This is a humor app for "pulling an estimate from your sleeve."
 
 **Platforms (in priority order):** iOS (primary) → Web (Blazor) → macOS
 
@@ -41,8 +41,8 @@ Hiha-Arvio (Finnish: "Sleeve Estimate") is a .NET 8 MAUI cross-platform applicat
 
 ## Technology Stack
 
-- **Framework:** .NET 8 MAUI (LTS)
-- **Language:** C# 12 with nullable reference types
+- **Framework:** .NET 9 MAUI
+- **Language:** C# 13 with nullable reference types
 - **Database:** SQLite via `sqlite-net-pcl`
 - **MVVM:** CommunityToolkit.Mvvm (source generators)
 - **Testing:** xUnit, NSubstitute, FluentAssertions, Coverlet
@@ -139,9 +139,9 @@ HihaArvio.sln
 
 ### Build Commands
 - **Build all platforms:** `dotnet build HihaArvio.sln`
-- **Build specific framework:** `dotnet build HihaArvio.sln -f net8.0`
-- **Build iOS:** `dotnet build HihaArvio.sln -f net8.0-ios`
-- **Build macOS:** `dotnet build HihaArvio.sln -f net8.0-maccatalyst`
+- **Build specific framework:** `dotnet build HihaArvio.sln -f net9.0`
+- **Build iOS:** `dotnet build HihaArvio.sln -f net9.0-ios`
+- **Build macOS:** `dotnet build HihaArvio.sln -f net9.0-maccatalyst`
 
 ### Test Commands
 - **Run all tests:** `dotnet test tests/HihaArvio.Tests/HihaArvio.Tests.csproj`
@@ -153,8 +153,8 @@ HihaArvio.sln
 - **Coverage files:** Located in `tests/HihaArvio.Tests/TestResults/{guid}/coverage.cobertura.xml`
 
 ### Run Commands
-- **iOS Simulator:** `dotnet build src/HihaArvio/HihaArvio.csproj -t:Run -f net8.0-ios`
-- **macOS:** `dotnet build src/HihaArvio/HihaArvio.csproj -t:Run -f net8.0-maccatalyst`
+- **iOS Simulator:** `dotnet build src/HihaArvio/HihaArvio.csproj -t:Run -f net9.0-ios`
+- **macOS:** `dotnet build src/HihaArvio/HihaArvio.csproj -t:Run -f net9.0-maccatalyst`
 
 ### Notes
 - All commands should be run from the repository root directory
@@ -205,7 +205,7 @@ HihaArvio.sln
 - Solution structure with src/HihaArvio and tests/HihaArvio.Tests
 - Core models: EstimateMode, EstimateResult, ShakeData, AppSettings
 - 48 tests, all passing
-- Build verification: all platforms (net8.0, iOS, macOS)
+- Build verification: all platforms (net9.0, iOS, macOS)
 
 **Milestone 2: Services Layer (✅ Complete)**
 - IEstimateService + EstimateService (25 tests)
@@ -280,7 +280,7 @@ HihaArvio.sln
   - TabBar with 3 tabs: Estimate, History, Settings
   - Each tab uses ContentTemplate for lazy loading
 - **Total: 165 tests still passing (no UI tests yet)**
-- **Build:** 0 warnings, 0 errors across all platforms (net8.0, iOS, macOS Catalyst)
+- **Build:** 0 warnings, 0 errors across all platforms (net9.0, iOS, macOS Catalyst)
 
 **Milestone 5: Platform-Specific Implementations (✅ Complete)**
 - IAccelerometerService interface
@@ -314,7 +314,7 @@ HihaArvio.sln
   - Dispose pattern implemented for cleanup
 - Final verification
   - **189 tests passing** across all layers
-  - **0 warnings, 0 errors** on all platforms (net8.0, iOS, macOS Catalyst)
+  - **0 warnings, 0 errors** on all platforms (net9.0, iOS, macOS Catalyst)
   - Models (48 tests) + Services (71 tests) + ViewModels (46 tests) + Accelerometer (24 tests)
 - Build artifacts verified for all target frameworks
 

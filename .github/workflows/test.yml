@@ -17,21 +17,21 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
     - name: Setup .NET
-      uses: actions/setup-dotnet@d4c94342e560b34958eacfc5d055d21461ed1c5d # v5.0.0
+      uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7 # v5.2.0
       with:
-        dotnet-version: '8.0.x'
+        dotnet-version: '9.0.x'
 
     - name: Restore dependencies
-      run: dotnet restore tests/HihaArvio.Tests/HihaArvio.Tests.csproj /p:TargetFrameworks=net8.0
+      run: dotnet restore tests/HihaArvio.Tests/HihaArvio.Tests.csproj /p:TargetFrameworks=net9.0
 
     - name: Build test project
-      run: dotnet build tests/HihaArvio.Tests/HihaArvio.Tests.csproj --configuration Release --no-restore /p:TargetFrameworks=net8.0
+      run: dotnet build tests/HihaArvio.Tests/HihaArvio.Tests.csproj --configuration Release --no-restore /p:TargetFrameworks=net9.0
 
     - name: Run tests with coverage
-      run: dotnet test tests/HihaArvio.Tests/HihaArvio.Tests.csproj --configuration Release --no-build --verbosity normal /p:TargetFrameworks=net8.0 --collect:"XPlat Code Coverage" --logger "trx;LogFileName=test-results.trx"
+      run: dotnet test tests/HihaArvio.Tests/HihaArvio.Tests.csproj --configuration Release --no-build --verbosity normal /p:TargetFrameworks=net9.0 --collect:"XPlat Code Coverage" --logger "trx;LogFileName=test-results.trx"
 
     - name: Install ReportGenerator
       run: dotnet tool install --global dotnet-reportgenerator-globaltool
@@ -43,14 +43,14 @@ jobs:
       run: |
         # Extract and display line coverage percentage
         COVERAGE=$(grep -oP 'Line coverage: \K[\d.]+' coverage/Summary.txt | head -1)
-        echo "📊 Code coverage for net8.0 target: ${COVERAGE}%"
+        echo "📊 Code coverage for net9.0 target: ${COVERAGE}%"
         echo ""
         echo "Note: Multi-target MAUI projects cannot achieve full coverage on Linux runners."
-        echo "Platform-specific code (iOS/macOS) is excluded when building net8.0 only."
+        echo "Platform-specific code (iOS/macOS) is excluded when building net9.0 only."
         echo "Full coverage measurement requires macOS runners with all target frameworks."
 
     - name: Upload coverage report
-      uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
       if: always()
       with:
         name: coverage-report
@@ -58,7 +58,7 @@ jobs:
         retention-days: 30
 
     - name: Publish test results
-      uses: dorny/test-reporter@dc3a92680fcc15842eef52e8c4606ea7ce6bd3f3 # v2.1.1
+      uses: dorny/test-reporter@3d76b34a4535afbd0600d347b09a6ee5deb3ed7f # v2.6.0
       if: always()
       with:
         name: Test Results
@@ -67,7 +67,7 @@ jobs:
         fail-on-error: true
 
     - name: Upload test results
-      uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
       if: always()
       with:
         name: test-results
