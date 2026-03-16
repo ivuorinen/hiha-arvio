@@ -22,16 +22,16 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7 # v5.2.0
       with:
-        dotnet-version: '9.0.x'
+        dotnet-version: '10.0.x'
 
     - name: Restore dependencies
-      run: dotnet restore tests/HihaArvio.Tests/HihaArvio.Tests.csproj /p:TargetFrameworks=net9.0
+      run: dotnet restore tests/HihaArvio.Tests/HihaArvio.Tests.csproj /p:TargetFrameworks=net10.0
 
     - name: Build test project
-      run: dotnet build tests/HihaArvio.Tests/HihaArvio.Tests.csproj --configuration Release --no-restore /p:TargetFrameworks=net9.0
+      run: dotnet build tests/HihaArvio.Tests/HihaArvio.Tests.csproj --configuration Release --no-restore /p:TargetFrameworks=net10.0
 
     - name: Run tests with coverage
-      run: dotnet test tests/HihaArvio.Tests/HihaArvio.Tests.csproj --configuration Release --no-build --verbosity normal /p:TargetFrameworks=net9.0 --collect:"XPlat Code Coverage" --logger "trx;LogFileName=test-results.trx"
+      run: dotnet test tests/HihaArvio.Tests/HihaArvio.Tests.csproj --configuration Release --no-build --verbosity normal /p:TargetFrameworks=net10.0 --collect:"XPlat Code Coverage" --logger "trx;LogFileName=test-results.trx"
 
     - name: Install ReportGenerator
       run: dotnet tool install --global dotnet-reportgenerator-globaltool
@@ -43,10 +43,10 @@ jobs:
       run: |
         # Extract and display line coverage percentage
         COVERAGE=$(grep -oP 'Line coverage: \K[\d.]+' coverage/Summary.txt | head -1)
-        echo "📊 Code coverage for net9.0 target: ${COVERAGE}%"
+        echo "📊 Code coverage for net10.0 target: ${COVERAGE}%"
         echo ""
         echo "Note: Multi-target MAUI projects cannot achieve full coverage on Linux runners."
-        echo "Platform-specific code (iOS/macOS) is excluded when building net9.0 only."
+        echo "Platform-specific code (iOS/macOS) is excluded when building net10.0 only."
         echo "Full coverage measurement requires macOS runners with all target frameworks."
 
     - name: Upload coverage report

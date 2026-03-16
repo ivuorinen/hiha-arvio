@@ -22,7 +22,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7 # v5.2.0
       with:
-        dotnet-version: '9.0.x'
+        dotnet-version: '10.0.x'
 
     - name: Select Xcode version
       uses: maxim-lobanov/setup-xcode@60606e260d2fc5762a71e64e74b2174e8ea3c8bd # v1.6.0
@@ -33,15 +33,15 @@ jobs:
       run: dotnet workload restore src/HihaArvio/HihaArvio.csproj
 
     - name: Build iOS
-      run: dotnet build src/HihaArvio/HihaArvio.csproj -f net9.0-ios -c Release /p:ArchiveOnBuild=false /p:EnableCodeSigning=false
+      run: dotnet build src/HihaArvio/HihaArvio.csproj -f net10.0-ios -c Release /p:ArchiveOnBuild=false /p:EnableCodeSigning=false
 
     - name: Upload iOS build artifacts
       uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
       with:
         name: ios-build
         path: |
-          src/HihaArvio/bin/Release/net9.0-ios/**/*.app
-          src/HihaArvio/bin/Release/net9.0-ios/**/*.ipa
+          src/HihaArvio/bin/Release/net10.0-ios/**/*.app
+          src/HihaArvio/bin/Release/net10.0-ios/**/*.ipa
         retention-days: 7
 
   build-maccatalyst:
@@ -58,7 +58,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7 # v5.2.0
       with:
-        dotnet-version: '9.0.x'
+        dotnet-version: '10.0.x'
 
     - name: Select Xcode version
       uses: maxim-lobanov/setup-xcode@60606e260d2fc5762a71e64e74b2174e8ea3c8bd # v1.6.0
@@ -69,15 +69,15 @@ jobs:
       run: dotnet workload restore src/HihaArvio/HihaArvio.csproj
 
     - name: Build macOS Catalyst
-      run: dotnet build src/HihaArvio/HihaArvio.csproj -f net9.0-maccatalyst -c Release /p:ArchiveOnBuild=false /p:EnableCodeSigning=false
+      run: dotnet build src/HihaArvio/HihaArvio.csproj -f net10.0-maccatalyst -c Release /p:ArchiveOnBuild=false /p:EnableCodeSigning=false
 
     - name: Upload macOS build artifacts
       uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
       with:
         name: maccatalyst-build
         path: |
-          src/HihaArvio/bin/Release/net9.0-maccatalyst/**/*.app
-          src/HihaArvio/bin/Release/net9.0-maccatalyst/**/*.pkg
+          src/HihaArvio/bin/Release/net10.0-maccatalyst/**/*.app
+          src/HihaArvio/bin/Release/net10.0-maccatalyst/**/*.pkg
         retention-days: 7
 
   build-status:
