@@ -136,7 +136,13 @@ jobs:
         if [[ "$EVENT_NAME" == "workflow_dispatch" ]]; then
           echo "changelog=Manual release of version $VERSION" >> "$GITHUB_OUTPUT"
         else
-          PREVIOUS_TAG=$(git describe --abbrev=0 --tags "$(git rev-list --tags --skip=1 --max-count=1)" 2>/dev/null || echo "")
+          PREVIOUS_TAG=""
+          for tag in $(git tag --sort=-creatordate); do
+            if [ "$tag" != "v$VERSION" ] && git merge-base --is-ancestor "$tag" HEAD 2>/dev/null; then
+              PREVIOUS_TAG="$tag"
+              break
+            fi
+          done
           if [[ -z "$PREVIOUS_TAG" ]]; then
             CHANGELOG=$(git log --pretty=format:"- %s (%h)" --no-merges)
           else
