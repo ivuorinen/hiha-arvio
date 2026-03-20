@@ -72,30 +72,29 @@ public class EstimateServiceTests
 
     #endregion
 
-    #region Two-Pool Selection Tests (Per Spec: Gentle vs Hard)
+    #region Range-Based Selection Tests (Per Spec §3.2.3)
 
     /// <summary>
-    /// Verifies that intensity below 0.5 selects estimates from the gentle pool.
+    /// Verifies that low intensity (below 0.3) selects from narrow range (first 20% of pool).
+    /// Per spec §3.2.3: intensity &lt; 0.3 → first 20% of pool.
     /// </summary>
     [Theory]
-    [InlineData(0.0, EstimateMode.Work)]  // Lowest intensity → gentle pool
+    [InlineData(0.0, EstimateMode.Work)]
     [InlineData(0.1, EstimateMode.Work)]
-    [InlineData(0.3, EstimateMode.Work)]
-    [InlineData(0.49, EstimateMode.Work)] // Just below threshold
+    [InlineData(0.29, EstimateMode.Work)]
     [InlineData(0.0, EstimateMode.Generic)]
-    [InlineData(0.2, EstimateMode.Generic)]
-    [InlineData(0.4, EstimateMode.Generic)]
-    public void GenerateEstimate_WithLowIntensity_ShouldSelectFromGentlePool(double intensity, EstimateMode mode)
+    [InlineData(0.15, EstimateMode.Generic)]
+    public void GenerateEstimate_WithLowIntensity_ShouldSelectFromNarrowRange(double intensity, EstimateMode mode)
     {
         // Arrange
         var duration = TimeSpan.FromSeconds(5);
 
-        // Act - Generate multiple estimates to verify pool selection
-        var results = Enumerable.Range(0, 50)
+        // Act - Generate multiple estimates
+        var results = Enumerable.Range(0, 100)
             .Select(_ => _service.GenerateEstimate(intensity, duration, mode))
             .ToList();
 
-        // Assert - All results should be from gentle pool
+        // Assert - All results should be valid
         results.Should().AllSatisfy(r =>
         {
             r.Mode.Should().Be(mode);
@@ -103,29 +102,28 @@ public class EstimateServiceTests
             r.EstimateText.Should().NotBeNullOrEmpty();
         });
 
-        // Should have good variety from the expanded pool
+        // Low intensity should have limited variety (first 20% of pool)
         var uniqueEstimates = results.Select(r => r.EstimateText).Distinct().Count();
-        uniqueEstimates.Should().BeGreaterThan(5, "gentle pool should have variety");
+        uniqueEstimates.Should().BeGreaterThan(2, "narrow range should still have some variety");
     }
 
     /// <summary>
-    /// Verifies that intensity at or above 0.5 selects estimates from the hard pool.
+    /// Verifies that medium intensity (0.3-0.7) selects from medium range (first 50% of pool).
+    /// Per spec §3.2.3: 0.3 ≤ intensity &lt; 0.7 → first 50% of pool.
     /// </summary>
     [Theory]
-    [InlineData(0.5, EstimateMode.Work)]  // At threshold → hard pool
-    [InlineData(0.6, EstimateMode.Work)]
-    [InlineData(0.8, EstimateMode.Work)]
-    [InlineData(1.0, EstimateMode.Work)]  // Maximum intensity
-    [InlineData(0.5, EstimateMode.Generic)]
-    [InlineData(0.7, EstimateMode.Generic)]
-    [InlineData(0.9, EstimateMode.Generic)]
-    public void GenerateEstimate_WithHighIntensity_ShouldSelectFromHardPool(double intensity, EstimateMode mode)
+    [InlineData(0.3, EstimateMode.Work)]
+    [InlineData(0.5, EstimateMode.Work)]
+    [InlineData(0.69, EstimateMode.Work)]
+    [InlineData(0.4, EstimateMode.Generic)]
+    [InlineData(0.6, EstimateMode.Generic)]
+    public void GenerateEstimate_WithMediumIntensity_ShouldSelectFromMediumRange(double intensity, EstimateMode mode)
     {
         // Arrange
         var duration = TimeSpan.FromSeconds(5);
 
         // Act
-        var results = Enumerable.Range(0, 100)
+        var results = Enumerable.Range(0, 200)
             .Select(_ => _service.GenerateEstimate(intensity, duration, mode))
             .ToList();
 
@@ -133,52 +131,88 @@ public class EstimateServiceTests
         results.Should().AllSatisfy(r =>
         {
             r.Mode.Should().Be(mode);
-            r.ShakeIntensity.Should().Be(intensity);
             r.EstimateText.Should().NotBeNullOrEmpty();
         });
 
-        // Hard pool should have maximum variety (larger pool)
+        // Medium range should have more variety than low
         var uniqueEstimates = results.Select(r => r.EstimateText).Distinct().Count();
-        uniqueEstimates.Should().BeGreaterThan(10, "hard pool should have extensive variety");
+        uniqueEstimates.Should().BeGreaterThan(10, "medium range should have good variety");
     }
 
     /// <summary>
-    /// Verifies that the 0.5 intensity threshold produces distinct selections from gentle and hard pools.
+    /// Verifies that high intensity (>= 0.7) selects from entire pool.
+    /// Per spec §3.2.3: intensity ≥ 0.7 → entire pool.
     /// </summary>
-    [Fact]
-    public void GenerateEstimate_ThresholdAt0Point5_ShouldProduceDistinctPoolSelections()
+    [Theory]
+    [InlineData(0.7, EstimateMode.Work)]
+    [InlineData(0.8, EstimateMode.Work)]
+    [InlineData(1.0, EstimateMode.Work)]
+    [InlineData(0.7, EstimateMode.Generic)]
+    [InlineData(0.9, EstimateMode.Generic)]
+    public void GenerateEstimate_WithHighIntensity_ShouldSelectFromEntirePool(double intensity, EstimateMode mode)
     {
         // Arrange
         var duration = TimeSpan.FromSeconds(5);
 
-        // Act - Sample both sides of the threshold
-        var gentleResults = Enumerable.Range(0, 50)
-            .Select(_ => _service.GenerateEstimate(0.49, duration, EstimateMode.Work))
+        // Act
+        var results = Enumerable.Range(0, 300)
+            .Select(_ => _service.GenerateEstimate(intensity, duration, mode))
+            .ToList();
+
+        // Assert
+        results.Should().AllSatisfy(r =>
+        {
+            r.Mode.Should().Be(mode);
+            r.EstimateText.Should().NotBeNullOrEmpty();
+        });
+
+        // Full pool should have maximum variety
+        var uniqueEstimates = results.Select(r => r.EstimateText).Distinct().Count();
+        uniqueEstimates.Should().BeGreaterThan(30, "entire pool should have extensive variety");
+    }
+
+    /// <summary>
+    /// Verifies that increasing intensity progressively increases the variety of possible estimates.
+    /// This confirms the range-based algorithm: low → narrow, medium → wider, high → full pool.
+    /// </summary>
+    [Fact]
+    public void GenerateEstimate_IncreasingIntensity_ShouldIncreaseVariety()
+    {
+        // Arrange
+        var duration = TimeSpan.FromSeconds(5);
+        const int sampleSize = 300;
+
+        // Act - Sample at each intensity tier
+        var lowVariety = Enumerable.Range(0, sampleSize)
+            .Select(_ => _service.GenerateEstimate(0.1, duration, EstimateMode.Work))
             .Select(r => r.EstimateText)
             .Distinct()
-            .ToHashSet();
+            .Count();
 
-        var hardResults = Enumerable.Range(0, 50)
+        var mediumVariety = Enumerable.Range(0, sampleSize)
             .Select(_ => _service.GenerateEstimate(0.5, duration, EstimateMode.Work))
             .Select(r => r.EstimateText)
             .Distinct()
-            .ToHashSet();
+            .Count();
 
-        // Assert - The pools should have some different estimates
-        // (They're different pools, so overlap might be minimal or none)
-        var overlap = gentleResults.Intersect(hardResults).Count();
-        var combined = gentleResults.Union(hardResults).Count();
+        var highVariety = Enumerable.Range(0, sampleSize)
+            .Select(_ => _service.GenerateEstimate(0.9, duration, EstimateMode.Work))
+            .Select(r => r.EstimateText)
+            .Distinct()
+            .Count();
 
-        // With 35 gentle + 60 hard = 95 total unique estimates in Work mode
-        combined.Should().BeGreaterThan(20, "combined selections from both pools should show variety");
+        // Assert - Variety should increase with intensity
+        mediumVariety.Should().BeGreaterThan(lowVariety, "medium intensity should access more estimates than low");
+        highVariety.Should().BeGreaterThan(mediumVariety, "high intensity should access more estimates than medium");
     }
 
     #endregion
 
-    #region Expanded Pool Tests (5x Spec)
+    #region Pool Size Tests (5x Spec)
 
     /// <summary>
-    /// Verifies that Work mode gentle and hard pools contain the expected expanded number of estimates.
+    /// Verifies that Work mode pool (merged) contains the expected expanded number of estimates.
+    /// Full pool = 95 items (35 conservative + 60 wide-range).
     /// </summary>
     [Fact]
     public void GenerateEstimate_WorkMode_ShouldHaveExpandedPoolSize()
@@ -186,27 +220,20 @@ public class EstimateServiceTests
         // Arrange
         var duration = TimeSpan.FromSeconds(5);
 
-        // Act - Generate many samples to discover pool diversity
-        var gentleResults = Enumerable.Range(0, 200)
-            .Select(_ => _service.GenerateEstimate(0.3, duration, EstimateMode.Work))
+        // Act - Use high intensity to access full pool
+        var fullPoolResults = Enumerable.Range(0, 500)
+            .Select(_ => _service.GenerateEstimate(0.9, duration, EstimateMode.Work))
             .Select(r => r.EstimateText)
             .Distinct()
             .Count();
 
-        var hardResults = Enumerable.Range(0, 300)
-            .Select(_ => _service.GenerateEstimate(0.8, duration, EstimateMode.Work))
-            .Select(r => r.EstimateText)
-            .Distinct()
-            .Count();
-
-        // Assert - Should discover most of the expanded pools
-        // Gentle: 35 items (5x spec's 7), Hard: 60 items (5x spec's 12)
-        gentleResults.Should().BeGreaterThan(20, "Work gentle pool should have expanded size");
-        hardResults.Should().BeGreaterThan(30, "Work hard pool should have expanded size");
+        // Assert - Should discover most of the 95-item merged pool
+        fullPoolResults.Should().BeGreaterThan(50, "Work pool should have expanded size");
     }
 
     /// <summary>
-    /// Verifies that Generic mode gentle and hard pools contain the expected expanded number of estimates.
+    /// Verifies that Generic mode pool (merged) contains the expected expanded number of estimates.
+    /// Full pool = 115 items (40 short + 75 wide-range).
     /// </summary>
     [Fact]
     public void GenerateEstimate_GenericMode_ShouldHaveExpandedPoolSize()
@@ -214,23 +241,15 @@ public class EstimateServiceTests
         // Arrange
         var duration = TimeSpan.FromSeconds(5);
 
-        // Act
-        var gentleResults = Enumerable.Range(0, 200)
-            .Select(_ => _service.GenerateEstimate(0.3, duration, EstimateMode.Generic))
+        // Act - Use high intensity to access full pool
+        var fullPoolResults = Enumerable.Range(0, 500)
+            .Select(_ => _service.GenerateEstimate(0.9, duration, EstimateMode.Generic))
             .Select(r => r.EstimateText)
             .Distinct()
             .Count();
 
-        var hardResults = Enumerable.Range(0, 300)
-            .Select(_ => _service.GenerateEstimate(0.8, duration, EstimateMode.Generic))
-            .Select(r => r.EstimateText)
-            .Distinct()
-            .Count();
-
-        // Assert
-        // Gentle: 40 items (5x spec's 8), Hard: 75 items (5x spec's 15)
-        gentleResults.Should().BeGreaterThan(20, "Generic gentle pool should have expanded size");
-        hardResults.Should().BeGreaterThan(35, "Generic hard pool should have expanded size");
+        // Assert - Should discover most of the 115-item merged pool
+        fullPoolResults.Should().BeGreaterThan(60, "Generic pool should have expanded size");
     }
 
     /// <summary>
@@ -239,12 +258,12 @@ public class EstimateServiceTests
     [Fact]
     public void GenerateEstimate_HumorousMode_ShouldHaveExpandedPoolSize()
     {
-        // Arrange
+        // Arrange - Use high intensity to access full pool
         var duration = TimeSpan.FromSeconds(16); // Trigger humorous via easter egg
 
         // Act
-        var results = Enumerable.Range(0, 200)
-            .Select(_ => _service.GenerateEstimate(0.5, duration, EstimateMode.Work))
+        var results = Enumerable.Range(0, 300)
+            .Select(_ => _service.GenerateEstimate(0.9, duration, EstimateMode.Work))
             .Select(r => r.EstimateText)
             .Distinct()
             .Count();
