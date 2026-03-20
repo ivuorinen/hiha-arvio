@@ -12,8 +12,8 @@ This directory contains the CI/CD workflows for HihaArvio.
 
 **What it does**:
 - Runs on Ubuntu (fastest, cheapest for tests)
-- Sets up .NET 9.0
-- Restores and builds `tests/HihaArvio.Tests/HihaArvio.Tests.csproj` for the `net9.0` target
+- Sets up .NET 10.0
+- Restores and builds `tests/HihaArvio.Tests/HihaArvio.Tests.csproj` for the `net10.0` target
 - Runs all xUnit tests in `tests/HihaArvio.Tests/HihaArvio.Tests.csproj`
 - Publishes test results and coverage reports
 - Uploads test artifacts for review
@@ -98,16 +98,16 @@ Tags containing `alpha`, `beta`, or `rc` are marked as pre-releases.
 
 ### Running Tests Locally
 ```bash
-dotnet test tests/HihaArvio.Tests/HihaArvio.Tests.csproj -f net9.0
+dotnet test tests/HihaArvio.Tests/HihaArvio.Tests.csproj -f net10.0
 ```
 
 ### Building Locally
 ```bash
 # iOS
-dotnet build src/HihaArvio/HihaArvio.csproj -f net9.0-ios -c Release
+dotnet build src/HihaArvio/HihaArvio.csproj -f net10.0-ios -c Release
 
 # macOS Catalyst
-dotnet build src/HihaArvio/HihaArvio.csproj -f net9.0-maccatalyst -c Release
+dotnet build src/HihaArvio/HihaArvio.csproj -f net10.0-maccatalyst -c Release
 ```
 
 ### Creating a Release
@@ -153,8 +153,8 @@ For signed releases, add:
 - `actions/checkout@v6.0.2` - Checkout repository
 - `actions/setup-dotnet@v5.2.0` - Setup .NET SDK
 - `actions/upload-artifact@v7.0.0` - Upload build artifacts
-- `softprops/action-gh-release@v2.5.0` - Create GitHub releases
-- `actions/download-artifact@v8.0.0` - Download build artifacts for release
+- `softprops/action-gh-release@v2.6.1` - Create GitHub releases
+- `actions/download-artifact@v8.0.1` - Download build artifacts for release
 - `dorny/test-reporter@v2.6.0` - Generate test reports
 
 ---
@@ -164,7 +164,7 @@ For signed releases, add:
 ### Tests Failing
 Check test output in workflow logs. Run locally with:
 ```bash
-dotnet test tests/HihaArvio.Tests/HihaArvio.Tests.csproj -f net9.0 --verbosity detailed
+dotnet test tests/HihaArvio.Tests/HihaArvio.Tests.csproj -f net10.0 --verbosity detailed
 ```
 
 ### Build Failing

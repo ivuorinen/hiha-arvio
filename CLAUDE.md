@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Hiha-Arvio (Finnish: "Sleeve Estimate") is a .NET 9 MAUI cross-platform application that generates semi-random time estimates based on physical shake input (accelerometer on mobile, mouse movement on desktop). This is a humor app for "pulling an estimate from your sleeve."
+Hiha-Arvio (Finnish: "Sleeve Estimate") is a .NET 10 MAUI cross-platform application that generates semi-random time estimates based on physical shake input (accelerometer on mobile, mouse movement on desktop). This is a humor app for "pulling an estimate from your sleeve."
 
 **Platforms (in priority order):** iOS (primary) → Web (Blazor) → macOS
 
@@ -41,7 +41,7 @@ Hiha-Arvio (Finnish: "Sleeve Estimate") is a .NET 9 MAUI cross-platform applicat
 
 ## Technology Stack
 
-- **Framework:** .NET 9 MAUI
+- **Framework:** .NET 10 MAUI
 - **Language:** C# 13 with nullable reference types
 - **Database:** SQLite via `sqlite-net-pcl`
 - **MVVM:** CommunityToolkit.Mvvm (source generators)
@@ -139,9 +139,9 @@ HihaArvio.sln
 
 ### Build Commands
 - **Build all platforms:** `dotnet build HihaArvio.sln`
-- **Build specific framework:** `dotnet build HihaArvio.sln -f net9.0`
-- **Build iOS:** `dotnet build HihaArvio.sln -f net9.0-ios`
-- **Build macOS:** `dotnet build HihaArvio.sln -f net9.0-maccatalyst`
+- **Build specific framework:** `dotnet build HihaArvio.sln -f net10.0`
+- **Build iOS:** `dotnet build HihaArvio.sln -f net10.0-ios`
+- **Build macOS:** `dotnet build HihaArvio.sln -f net10.0-maccatalyst`
 
 ### Test Commands
 - **Run all tests:** `dotnet test tests/HihaArvio.Tests/HihaArvio.Tests.csproj`
@@ -153,8 +153,8 @@ HihaArvio.sln
 - **Coverage files:** Located in `tests/HihaArvio.Tests/TestResults/{guid}/coverage.cobertura.xml`
 
 ### Run Commands
-- **iOS Simulator:** `dotnet build src/HihaArvio/HihaArvio.csproj -t:Run -f net9.0-ios`
-- **macOS:** `dotnet build src/HihaArvio/HihaArvio.csproj -t:Run -f net9.0-maccatalyst`
+- **iOS Simulator:** `dotnet build src/HihaArvio/HihaArvio.csproj -t:Run -f net10.0-ios`
+- **macOS:** `dotnet build src/HihaArvio/HihaArvio.csproj -t:Run -f net10.0-maccatalyst`
 
 ### Notes
 - All commands should be run from the repository root directory
@@ -205,7 +205,7 @@ HihaArvio.sln
 - Solution structure with src/HihaArvio and tests/HihaArvio.Tests
 - Core models: EstimateMode, EstimateResult, ShakeData, AppSettings
 - 48 tests, all passing
-- Build verification: all platforms (net9.0, iOS, macOS)
+- Build verification: all platforms (net10.0, iOS, macOS)
 
 **Milestone 2: Services Layer (✅ Complete)**
 - IEstimateService + EstimateService (25 tests)
@@ -280,7 +280,7 @@ HihaArvio.sln
   - TabBar with 3 tabs: Estimate, History, Settings
   - Each tab uses ContentTemplate for lazy loading
 - **Total: 165 tests still passing (no UI tests yet)**
-- **Build:** 0 warnings, 0 errors across all platforms (net9.0, iOS, macOS Catalyst)
+- **Build:** 0 warnings, 0 errors across all platforms (net10.0, iOS, macOS Catalyst)
 
 **Milestone 5: Platform-Specific Implementations (✅ Complete)**
 - IAccelerometerService interface
@@ -314,7 +314,7 @@ HihaArvio.sln
   - Dispose pattern implemented for cleanup
 - Final verification
   - **189 tests passing** across all layers
-  - **0 warnings, 0 errors** on all platforms (net9.0, iOS, macOS Catalyst)
+  - **0 warnings, 0 errors** on all platforms (net10.0, iOS, macOS Catalyst)
   - Models (48 tests) + Services (71 tests) + ViewModels (46 tests) + Accelerometer (24 tests)
 - Build artifacts verified for all target frameworks
 
@@ -342,3 +342,66 @@ Per design document, phased development:
 3. **Phase 3:** macOS app (native integration)
 
 Focus on Phase 1 first to validate core shake detection and estimate generation logic.
+
+# context-mode — MANDATORY routing rules
+
+You have context-mode MCP tools available. These rules are NOT optional — they protect your context window from flooding. A single unrouted command can dump 56 KB into context and waste the entire session.
+
+## BLOCKED commands — do NOT attempt these
+
+### curl / wget — BLOCKED
+Any Bash command containing `curl` or `wget` is intercepted and replaced with an error message. Do NOT retry.
+Instead use:
+- `ctx_fetch_and_index(url, source)` to fetch and index web pages
+- `ctx_execute(language: "javascript", code: "const r = await fetch(...)")` to run HTTP calls in sandbox
+
+### Inline HTTP — BLOCKED
+Any Bash command containing `fetch('http`, `requests.get(`, `requests.post(`, `http.get(`, or `http.request(` is intercepted and replaced with an error message. Do NOT retry with Bash.
+Instead use:
+- `ctx_execute(language, code)` to run HTTP calls in sandbox — only stdout enters context
+
+### WebFetch — BLOCKED
+WebFetch calls are denied entirely. The URL is extracted and you are told to use `ctx_fetch_and_index` instead.
+Instead use:
+- `ctx_fetch_and_index(url, source)` then `ctx_search(queries)` to query the indexed content
+
+## REDIRECTED tools — use sandbox equivalents
+
+### Bash (>20 lines output)
+Bash is ONLY for: `git`, `mkdir`, `rm`, `mv`, `cd`, `ls`, `npm install`, `pip install`, and other short-output commands.
+For everything else, use:
+- `ctx_batch_execute(commands, queries)` — run multiple commands + search in ONE call
+- `ctx_execute(language: "shell", code: "...")` — run in sandbox, only stdout enters context
+
+### Read (for analysis)
+If you are reading a file to **Edit** it → Read is correct (Edit needs content in context).
+If you are reading to **analyze, explore, or summarize** → use `ctx_execute_file(path, language, code)` instead. Only your printed summary enters context. The raw file content stays in the sandbox.
+
+### Grep (large results)
+Grep results can flood context. Use `ctx_execute(language: "shell", code: "grep ...")` to run searches in sandbox. Only your printed summary enters context.
+
+## Tool selection hierarchy
+
+1. **GATHER**: `ctx_batch_execute(commands, queries)` — Primary tool. Runs all commands, auto-indexes output, returns search results. ONE call replaces 30+ individual calls.
+2. **FOLLOW-UP**: `ctx_search(queries: ["q1", "q2", ...])` — Query indexed content. Pass ALL questions as array in ONE call.
+3. **PROCESSING**: `ctx_execute(language, code)` | `ctx_execute_file(path, language, code)` — Sandbox execution. Only stdout enters context.
+4. **WEB**: `ctx_fetch_and_index(url, source)` then `ctx_search(queries)` — Fetch, chunk, index, query. Raw HTML never enters context.
+5. **INDEX**: `ctx_index(content, source)` — Store content in FTS5 knowledge base for later search.
+
+## Subagent routing
+
+When spawning subagents (Agent/Task tool), the routing block is automatically injected into their prompt. Bash-type subagents are upgraded to general-purpose so they have access to MCP tools. You do NOT need to manually instruct subagents about context-mode.
+
+## Output constraints
+
+- Keep responses under 500 words.
+- Write artifacts (code, configs, PRDs) to FILES — never return them as inline text. Return only: file path + 1-line description.
+- When indexing content, use descriptive source labels so others can `ctx_search(source: "label")` later.
+
+## ctx commands
+
+| Command | Action |
+|---------|--------|
+| `ctx stats` | Call the `ctx_stats` MCP tool and display the full output verbatim |
+| `ctx doctor` | Call the `ctx_doctor` MCP tool, run the returned shell command, display as checklist |
+| `ctx upgrade` | Call the `ctx_upgrade` MCP tool, run the returned shell command, display as checklist |

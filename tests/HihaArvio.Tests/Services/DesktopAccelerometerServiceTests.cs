@@ -118,8 +118,12 @@ public class DesktopAccelerometerServiceTests : AccelerometerServiceContractTest
         service.ReadingChanged += (sender, reading) => readingCount++;
 
         // Act
+        var firstReadingReceived = new TaskCompletionSource<bool>();
+        service.ReadingChanged += (sender, reading) =>
+            firstReadingReceived.TrySetResult(true);
+
         service.Start();
-        await Task.Delay(100); // Wait for several readings
+        await firstReadingReceived.Task.WaitAsync(TimeSpan.FromSeconds(2));
         var countBeforeStop = readingCount;
 
         service.Stop();
