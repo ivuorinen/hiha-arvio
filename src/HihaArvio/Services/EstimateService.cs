@@ -11,7 +11,7 @@ namespace HihaArvio.Services;
 /// </summary>
 public class EstimateService : IEstimateService
 {
-    // Work Mode - Single ordered pool (95 items: 35 conservative + 60 wide-range)
+    // Work Mode - Single ordered pool (77 items: 35 conservative + 42 wide-range)
     // Ordered from conservative professional estimates to wide-range including optimistic/pessimistic
     private static readonly string[] WorkPool =
     {
@@ -22,20 +22,20 @@ public class EstimateService : IEstimateService
         "7 hours", "8 hours", "1.25 days", "2.5 days", "5.5 days", "10 days",
         "90 minutes", "150 minutes", "2.75 days", "3.25 days", "8 days", "12 days",
         "3.5 hours", "5.5 hours", "1.75 days", "2.25 days",
-        // Wide-range estimates (hard range)
-        "15 minutes", "30 minutes", "1 hour", "2 hours", "1 day", "3 days",
-        "1 week", "2 weeks", "1 month", "3 months", "6 months", "1 year",
-        "20 minutes", "45 minutes", "90 minutes", "3 hours", "2 days", "4 days",
-        "10 days", "3 weeks", "6 weeks", "2 months", "4 months", "8 months",
-        "25 minutes", "40 minutes", "75 minutes", "4 hours", "5 days", "1.5 weeks",
+        // Wide-range estimates (hard range, deduplicated)
+        "15 minutes", "30 minutes", "1 hour",
+        "1 month", "3 months", "6 months", "1 year",
+        "20 minutes", "45 minutes",
+        "3 weeks", "6 weeks", "2 months", "4 months", "8 months",
+        "25 minutes", "40 minutes", "75 minutes",
         "4 weeks", "5 weeks", "1.5 months", "2.5 months", "5 months", "9 months",
-        "10 minutes", "35 minutes", "50 minutes", "2.5 hours", "6 days", "8 days",
-        "9 days", "12 days", "5 days", "7 days", "1.25 months", "1.75 months",
+        "10 minutes", "35 minutes", "50 minutes",
+        "9 days", "7 days", "1.25 months", "1.75 months",
         "3.5 months", "7 months", "10 months", "14 months", "18 months", "2 years",
         "55 minutes", "65 minutes", "100 minutes", "120 minutes", "11 days", "13 days"
     };
 
-    // Generic Mode - Single ordered pool (115 items: 40 short + 75 wide-range)
+    // Generic Mode - Single ordered pool (87 items: 40 short + 47 wide-range)
     // Ordered from short specific timeframes to wider range from seconds to months
     private static readonly string[] GenericPool =
     {
@@ -50,21 +50,17 @@ public class EstimateService : IEstimateService
         "50 minutes", "4.5 hours", "6 hours",
         "11 minutes", "13 minutes", "16 minutes", "28 minutes", "55 minutes",
         "65 minutes", "5.5 hours", "7 hours",
-        // Wider range from seconds to months (hard range)
-        "30 seconds", "1 minute", "5 minutes", "15 minutes", "30 minutes",
-        "1 hour", "2 hours", "6 hours", "12 hours", "1 day",
+        // Wider range from seconds to months (hard range, deduplicated)
+        "30 seconds", "12 hours", "1 day",
         "3 days", "1 week", "2 weeks", "1 month",
-        "45 seconds", "2 minutes", "7 minutes", "20 minutes", "45 minutes",
-        "90 minutes", "3 hours", "8 hours", "18 hours", "2 days",
+        "45 seconds", "8 hours", "18 hours", "2 days",
         "4 days", "10 days", "3 weeks", "6 weeks", "2 months",
-        "1 minute 30 seconds", "3 minutes", "10 minutes", "25 minutes", "50 minutes",
-        "75 minutes", "4 hours", "9 hours", "15 hours", "1.5 days",
+        "1 minute 30 seconds", "9 hours", "15 hours", "1.5 days",
         "5 days", "8 days", "12 days", "4 weeks", "2.5 months",
-        "20 seconds", "40 seconds", "4 minutes", "12 minutes", "35 minutes",
-        "55 minutes", "5 hours", "7 hours", "10 hours", "20 hours",
+        "20 seconds", "40 seconds", "10 hours", "20 hours",
         "2.5 days", "6 days", "9 days", "11 days", "5 weeks", "3 months",
-        "15 seconds", "50 seconds", "6 minutes", "8 minutes", "14 minutes",
-        "40 minutes", "100 minutes", "120 minutes", "11 hours", "16 hours",
+        "15 seconds", "50 seconds", "14 minutes",
+        "100 minutes", "120 minutes", "11 hours", "16 hours",
         "22 hours", "3.5 days", "7 days", "14 days", "3.5 weeks"
     };
 
@@ -91,6 +87,9 @@ public class EstimateService : IEstimateService
     /// <inheritdoc/>
     public EstimateResult GenerateEstimate(double intensity, TimeSpan duration, EstimateMode mode)
     {
+        if (!Enum.IsDefined(mode))
+            throw new ArgumentOutOfRangeException(nameof(mode), mode, "Invalid estimate mode");
+
         // Per spec §3.2.3: Easter egg - duration > 15 seconds forces Humorous mode
         if (duration > TimeSpan.FromSeconds(15))
         {
@@ -121,8 +120,15 @@ public class EstimateService : IEstimateService
     ///   intensity &lt; 0.7 → first 50% of pool
     ///   intensity &gt;= 0.7 → entire pool
     /// </summary>
+    /// <param name="poolLength">The total number of items in the pool.</param>
+    /// <param name="intensity">The shake intensity, must be in the range [0.0, 1.0].</param>
+    /// <returns>The upper bound index for the selectable range.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when intensity is outside [0.0, 1.0].</exception>
     private static int CalculateRangeEnd(int poolLength, double intensity)
     {
+        if (intensity < 0.0 || intensity > 1.0)
+            throw new ArgumentOutOfRangeException(nameof(intensity), intensity, "Intensity must be between 0.0 and 1.0");
+
         double fraction = intensity switch
         {
             < 0.3 => 0.2,

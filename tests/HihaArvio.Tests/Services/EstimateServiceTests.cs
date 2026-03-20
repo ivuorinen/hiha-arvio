@@ -227,7 +227,7 @@ public class EstimateServiceTests
             .Distinct()
             .Count();
 
-        // Assert - Should discover most of the 95-item merged pool
+        // Assert - Should discover most of the 77-item merged pool
         fullPoolResults.Should().BeGreaterThan(50, "Work pool should have expanded size");
     }
 
@@ -248,7 +248,7 @@ public class EstimateServiceTests
             .Distinct()
             .Count();
 
-        // Assert - Should discover most of the 115-item merged pool
+        // Assert - Should discover most of the 87-item merged pool
         fullPoolResults.Should().BeGreaterThan(60, "Generic pool should have expanded size");
     }
 
@@ -417,6 +417,74 @@ public class EstimateServiceTests
             result.EstimateText.Should().NotBeNullOrEmpty();
             result.Mode.Should().Be(mode);
         }
+    }
+
+    #endregion
+
+    #region Input Validation Tests
+
+    /// <summary>
+    /// Verifies that an invalid enum value throws ArgumentOutOfRangeException.
+    /// </summary>
+    [Fact]
+    public void GenerateEstimate_WithInvalidEnum_ShouldThrow()
+    {
+        // Arrange
+        var invalidMode = (EstimateMode)99;
+
+        // Act
+        var act = () => _service.GenerateEstimate(0.5, TimeSpan.FromSeconds(5), invalidMode);
+
+        // Assert
+        act.Should().Throw<ArgumentOutOfRangeException>()
+            .WithParameterName("mode");
+    }
+
+    /// <summary>
+    /// Verifies that an invalid enum value throws even when duration exceeds 15 seconds.
+    /// The enum validation must happen BEFORE the easter egg check.
+    /// </summary>
+    [Fact]
+    public void GenerateEstimate_WithInvalidEnumAndLongDuration_ShouldThrow()
+    {
+        // Arrange
+        var invalidMode = (EstimateMode)99;
+        var longDuration = TimeSpan.FromSeconds(20);
+
+        // Act
+        var act = () => _service.GenerateEstimate(0.5, longDuration, invalidMode);
+
+        // Assert
+        act.Should().Throw<ArgumentOutOfRangeException>()
+            .WithParameterName("mode");
+    }
+
+    /// <summary>
+    /// Verifies that intensity below 0.0 throws ArgumentOutOfRangeException.
+    /// </summary>
+    [Fact]
+    public void GenerateEstimate_WithNegativeIntensity_ShouldThrow()
+    {
+        // Act
+        var act = () => _service.GenerateEstimate(-0.1, TimeSpan.FromSeconds(5), EstimateMode.Work);
+
+        // Assert
+        act.Should().Throw<ArgumentOutOfRangeException>()
+            .WithParameterName("intensity");
+    }
+
+    /// <summary>
+    /// Verifies that intensity above 1.0 throws ArgumentOutOfRangeException.
+    /// </summary>
+    [Fact]
+    public void GenerateEstimate_WithIntensityAboveOne_ShouldThrow()
+    {
+        // Act
+        var act = () => _service.GenerateEstimate(1.1, TimeSpan.FromSeconds(5), EstimateMode.Work);
+
+        // Assert
+        act.Should().Throw<ArgumentOutOfRangeException>()
+            .WithParameterName("intensity");
     }
 
     #endregion
