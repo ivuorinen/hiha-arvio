@@ -6,6 +6,9 @@ using NSubstitute;
 
 namespace HihaArvio.Tests.ViewModels;
 
+/// <summary>
+/// Tests for the MainViewModel covering initialization, shake detection integration, mode selection, property change notifications, and disposal.
+/// </summary>
 public class MainViewModelTests
 {
     private readonly IShakeDetectionService _shakeDetectionService;
@@ -31,6 +34,9 @@ public class MainViewModelTests
 
     #region Initialization Tests
 
+    /// <summary>
+    /// Verifies that the constructor loads settings from storage on initialization.
+    /// </summary>
     [Fact]
     public async Task Constructor_ShouldLoadSettings()
     {
@@ -45,9 +51,13 @@ public class MainViewModelTests
 
         // Assert
         vm.SelectedMode.Should().Be(EstimateMode.Generic);
-        await storageService.Received(1).LoadSettingsAsync();
+        // LoadSettingsAsync called at least once (constructor + SaveSettingsAsync when mode changes)
+        await storageService.Received().LoadSettingsAsync();
     }
 
+    /// <summary>
+    /// Verifies that shake monitoring starts automatically on construction.
+    /// </summary>
     [Fact]
     public void Constructor_ShouldStartMonitoringShakes()
     {
@@ -55,6 +65,9 @@ public class MainViewModelTests
         _shakeDetectionService.Received(1).StartMonitoring();
     }
 
+    /// <summary>
+    /// Verifies that the ViewModel subscribes to the ShakeDataChanged event.
+    /// </summary>
     [Fact]
     public void Constructor_ShouldSubscribeToShakeDataChanged()
     {
@@ -75,6 +88,9 @@ public class MainViewModelTests
         vm.Should().NotBeNull();
     }
 
+    /// <summary>
+    /// Verifies that CurrentEstimate is null on initialization.
+    /// </summary>
     [Fact]
     public void Constructor_ShouldInitializeWithNoCurrentEstimate()
     {
@@ -82,6 +98,9 @@ public class MainViewModelTests
         _viewModel.CurrentEstimate.Should().BeNull();
     }
 
+    /// <summary>
+    /// Verifies that CurrentShakeData has default values on initialization.
+    /// </summary>
     [Fact]
     public void Constructor_ShouldInitializeWithDefaultShakeData()
     {
@@ -96,6 +115,9 @@ public class MainViewModelTests
 
     #region Shake Detection Integration Tests
 
+    /// <summary>
+    /// Verifies that shake start events update the CurrentShakeData property.
+    /// </summary>
     [Fact]
     public void OnShakeDataChanged_WhenShakeStarts_ShouldUpdateCurrentShakeData()
     {
@@ -112,6 +134,9 @@ public class MainViewModelTests
         _viewModel.CurrentShakeData.Duration.Should().Be(TimeSpan.FromSeconds(3));
     }
 
+    /// <summary>
+    /// Verifies that an estimate is generated when shaking stops.
+    /// </summary>
     [Fact]
     public async Task OnShakeDataChanged_WhenShakeStops_ShouldGenerateEstimate()
     {
@@ -134,6 +159,9 @@ public class MainViewModelTests
         _estimateService.Received(1).GenerateEstimate(0.5, TimeSpan.FromSeconds(3), EstimateMode.Work);
     }
 
+    /// <summary>
+    /// Verifies that the generated estimate is saved to storage.
+    /// </summary>
     [Fact]
     public async Task OnShakeDataChanged_WhenShakeStops_ShouldSaveEstimateToStorage()
     {
@@ -158,6 +186,9 @@ public class MainViewModelTests
         await _storageService.Received(1).SaveEstimateAsync(estimate);
     }
 
+    /// <summary>
+    /// Verifies that CurrentEstimate is updated with the generated result.
+    /// </summary>
     [Fact]
     public async Task OnShakeDataChanged_WhenShakeStops_ShouldUpdateCurrentEstimate()
     {
@@ -183,6 +214,9 @@ public class MainViewModelTests
         _viewModel.CurrentEstimate!.EstimateText.Should().Be("2 weeks");
     }
 
+    /// <summary>
+    /// Verifies that no estimate is generated while shaking is still in progress.
+    /// </summary>
     [Fact]
     public void OnShakeDataChanged_WhenShakeContinues_ShouldNotGenerateEstimate()
     {
@@ -200,6 +234,9 @@ public class MainViewModelTests
         _estimateService.DidNotReceive().GenerateEstimate(Arg.Any<double>(), Arg.Any<TimeSpan>(), Arg.Any<EstimateMode>());
     }
 
+    /// <summary>
+    /// Verifies that the shake detection service is reset after generating an estimate.
+    /// </summary>
     [Fact]
     public async Task OnShakeDataChanged_WhenShakeStops_ShouldResetShakeDetectionService()
     {
@@ -227,6 +264,9 @@ public class MainViewModelTests
 
     #region Mode Selection Tests
 
+    /// <summary>
+    /// Verifies that changing SelectedMode persists the new setting to storage.
+    /// </summary>
     [Fact]
     public async Task SelectedMode_WhenChanged_ShouldSaveToStorage()
     {
@@ -239,6 +279,9 @@ public class MainViewModelTests
             s.SelectedMode == EstimateMode.Generic));
     }
 
+    /// <summary>
+    /// Verifies that the new mode is used when generating subsequent estimates.
+    /// </summary>
     [Fact]
     public async Task SelectedMode_WhenChanged_ShouldUseNewModeForEstimates()
     {
@@ -270,6 +313,9 @@ public class MainViewModelTests
 
     #region Property Change Notification Tests
 
+    /// <summary>
+    /// Verifies that changing CurrentShakeData raises PropertyChanged.
+    /// </summary>
     [Fact]
     public void CurrentShakeData_WhenChanged_ShouldRaisePropertyChanged()
     {
@@ -290,6 +336,9 @@ public class MainViewModelTests
         propertyChangedRaised.Should().BeTrue();
     }
 
+    /// <summary>
+    /// Verifies that changing CurrentEstimate raises PropertyChanged.
+    /// </summary>
     [Fact]
     public async Task CurrentEstimate_WhenChanged_ShouldRaisePropertyChanged()
     {
@@ -321,6 +370,9 @@ public class MainViewModelTests
         propertyChangedRaised.Should().BeTrue();
     }
 
+    /// <summary>
+    /// Verifies that changing SelectedMode raises PropertyChanged.
+    /// </summary>
     [Fact]
     public async Task SelectedMode_WhenChanged_ShouldRaisePropertyChanged()
     {
@@ -344,6 +396,9 @@ public class MainViewModelTests
 
     #region Disposal Tests
 
+    /// <summary>
+    /// Verifies that disposing the ViewModel stops shake monitoring.
+    /// </summary>
     [Fact]
     public void Dispose_ShouldStopMonitoring()
     {
@@ -354,6 +409,9 @@ public class MainViewModelTests
         _shakeDetectionService.Received(1).StopMonitoring();
     }
 
+    /// <summary>
+    /// Verifies that disposing the ViewModel unsubscribes from shake events.
+    /// </summary>
     [Fact]
     public void Dispose_ShouldUnsubscribeFromShakeDataChanged()
     {
@@ -368,6 +426,57 @@ public class MainViewModelTests
         // Assert - Should not throw, and CurrentShakeData should not update
         // (we can't directly test event unsubscription, but no exception means success)
         _viewModel.Should().NotBeNull();
+    }
+
+    #endregion
+
+    #region Robustness Tests
+
+    /// <summary>
+    /// Verifies that Reset() is called even when SaveEstimateAsync throws an exception.
+    /// </summary>
+    [Fact]
+    public async Task GenerateAndSaveEstimate_WhenSaveThrows_ShouldStillReset()
+    {
+        // Arrange
+        var estimate = EstimateResult.Create("2 weeks", EstimateMode.Work, 0.5, TimeSpan.FromSeconds(5));
+        _estimateService.GenerateEstimate(Arg.Any<double>(), Arg.Any<TimeSpan>(), Arg.Any<EstimateMode>())
+            .Returns(estimate);
+        _storageService.SaveEstimateAsync(Arg.Any<EstimateResult>())
+            .Returns(Task.FromException(new InvalidOperationException("Storage failure")));
+
+        // Start shake
+        _shakeDetectionService.ShakeDataChanged += Raise.Event<EventHandler<ShakeData>>(
+            _shakeDetectionService,
+            new ShakeData { IsShaking = true, Intensity = 0.5, Duration = TimeSpan.FromSeconds(3) });
+
+        // Act - Stop shake (triggers generate + save)
+        _shakeDetectionService.ShakeDataChanged += Raise.Event<EventHandler<ShakeData>>(
+            _shakeDetectionService,
+            new ShakeData { IsShaking = false, Intensity = 0.0, Duration = TimeSpan.Zero });
+
+        await Task.Delay(100);
+
+        // Assert - Reset should still be called despite save failure
+        _shakeDetectionService.Received().Reset();
+    }
+
+    /// <summary>
+    /// Verifies that calling Dispose twice is safe and idempotent.
+    /// </summary>
+    [Fact]
+    public void Dispose_CalledTwice_ShouldBeSafe()
+    {
+        // Act
+        var act = () =>
+        {
+            _viewModel.Dispose();
+            _viewModel.Dispose();
+        };
+
+        // Assert
+        act.Should().NotThrow();
+        _shakeDetectionService.Received(1).StopMonitoring();
     }
 
     #endregion

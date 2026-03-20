@@ -7,6 +7,9 @@ namespace HihaArvio;
 
 public static class MauiProgram
 {
+	/// <summary>
+	/// Configures and builds the MAUI application, registering all services, ViewModels, and pages.
+	/// </summary>
 	public static MauiApp CreateMauiApp()
 	{
 		var builder = MauiApp.CreateBuilder();

@@ -28,20 +28,34 @@ public partial class SettingsViewModel : ObservableObject
 
     private async Task LoadSettingsAsync()
     {
-        var settings = await _storageService.LoadSettingsAsync();
-        SelectedMode = settings.SelectedMode;
-        MaxHistorySize = settings.MaxHistorySize;
+        try
+        {
+            var settings = await _storageService.LoadSettingsAsync();
+            SelectedMode = settings.SelectedMode;
+            MaxHistorySize = settings.MaxHistorySize;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Failed to load settings: {ex.Message}");
+        }
     }
 
     [RelayCommand]
     private async Task SaveSettingsAsync()
     {
-        var settings = new AppSettings
+        try
         {
-            SelectedMode = SelectedMode,
-            MaxHistorySize = MaxHistorySize
-        };
+            var settings = new AppSettings
+            {
+                SelectedMode = SelectedMode,
+                MaxHistorySize = MaxHistorySize
+            };
 
-        await _storageService.SaveSettingsAsync(settings);
+            await _storageService.SaveSettingsAsync(settings);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Failed to save settings: {ex.Message}");
+        }
     }
 }

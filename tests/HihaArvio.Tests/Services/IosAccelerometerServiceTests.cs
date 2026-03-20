@@ -15,6 +15,9 @@ public class IosAccelerometerServiceTests : AccelerometerServiceContractTestsBas
         return new IosAccelerometerService();
     }
 
+    /// <summary>
+    /// Verifies that a new iOS accelerometer service instance starts in a stopped state.
+    /// </summary>
     [Fact]
     public void Constructor_ShouldInitializeWithStoppedState()
     {
@@ -26,6 +29,9 @@ public class IosAccelerometerServiceTests : AccelerometerServiceContractTestsBas
         // (Can't directly test internal state, but Start/Stop should work)
     }
 
+    /// <summary>
+    /// Verifies that IsSupported returns the correct value depending on the platform.
+    /// </summary>
     [Fact]
     public void IsSupported_ShouldBePlatformDependent()
     {
@@ -45,6 +51,9 @@ public class IosAccelerometerServiceTests : AccelerometerServiceContractTestsBas
 #endif
     }
 
+    /// <summary>
+    /// Verifies that calling Start multiple times does not throw an exception.
+    /// </summary>
     [Fact]
     public void Start_Multiple_ShouldNotThrow()
     {
@@ -65,6 +74,9 @@ public class IosAccelerometerServiceTests : AccelerometerServiceContractTestsBas
         service.Stop();
     }
 
+    /// <summary>
+    /// Verifies that calling Stop multiple times does not throw an exception.
+    /// </summary>
     [Fact]
     public void Stop_Multiple_ShouldNotThrow()
     {
@@ -83,6 +95,9 @@ public class IosAccelerometerServiceTests : AccelerometerServiceContractTestsBas
         act.Should().NotThrow();
     }
 
+    /// <summary>
+    /// Verifies that the ReadingChanged event subscription works without crashing.
+    /// </summary>
     [Fact]
     public async Task ReadingChanged_AfterStart_ShouldEventuallyFire()
     {

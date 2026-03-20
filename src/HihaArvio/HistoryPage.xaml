@@ -55,10 +55,10 @@
                                    FontAttributes="Bold"
                                    TextColor="{StaticResource Primary}"/>
 
-                            <!-- Mode Badge -->
+                            <!-- Mode Badge (color-coded per spec §3.4.2) -->
                             <Frame Grid.Row="0" Grid.Column="1"
                                    Padding="8,4"
-                                   BackgroundColor="{StaticResource Secondary}"
+                                   BackgroundColor="{Binding Mode, Converter={StaticResource ModeToColorConverter}}"
                                    CornerRadius="12"
                                    HasShadow="False">
                                 <Label Text="{Binding Mode}"
@@ -66,9 +66,9 @@
                                        TextColor="White"/>
                             </Frame>
 
-                            <!-- Timestamp -->
+                            <!-- Relative Timestamp (per spec §3.4.2) -->
                             <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
-                                   Text="{Binding Timestamp, StringFormat='{0:MMM d, yyyy h:mm tt}'}"
+                                   Text="{Binding Timestamp, Converter={StaticResource RelativeTimestampConverter}}"
                                    FontSize="14"
                                    TextColor="{StaticResource Gray600}"/>
 

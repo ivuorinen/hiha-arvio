@@ -12,13 +12,7 @@ namespace HihaArvio.Services;
 public class DesktopAccelerometerService : IAccelerometerService
 {
     private System.Timers.Timer? _timer;
-    private readonly Random _random;
     private const double BaseGravity = 1.0; // Device at rest experiences 1g
-
-    public DesktopAccelerometerService()
-    {
-        _random = new Random();
-    }
 
     /// <inheritdoc/>
     public event EventHandler<SensorReading>? ReadingChanged;
@@ -74,7 +68,7 @@ public class DesktopAccelerometerService : IAccelerometerService
     private double GenerateNoiseValue(double center, double variation)
     {
         // Generate value with normal distribution around center
-        return center + ((_random.NextDouble() - 0.5) * 2 * variation);
+        return center + ((Random.Shared.NextDouble() - 0.5) * 2 * variation);
     }
 
     /// <summary>
@@ -94,9 +88,9 @@ public class DesktopAccelerometerService : IAccelerometerService
         {
             var reading = new SensorReading
             {
-                X = (_random.NextDouble() - 0.5) * 3.0 * intensity,
-                Y = (_random.NextDouble() - 0.5) * 3.0 * intensity,
-                Z = BaseGravity + (_random.NextDouble() - 0.5) * 3.0 * intensity
+                X = (Random.Shared.NextDouble() - 0.5) * 3.0 * intensity,
+                Y = (Random.Shared.NextDouble() - 0.5) * 3.0 * intensity,
+                Z = BaseGravity + (Random.Shared.NextDouble() - 0.5) * 3.0 * intensity
             };
 
             ReadingChanged?.Invoke(this, reading);

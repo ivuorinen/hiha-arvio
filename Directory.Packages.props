@@ -1,0 +1,25 @@
+<Project>
+
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Main project packages -->
+    <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.1" />
+    <PackageVersion Include="Microsoft.Maui.Controls" Version="10.0.50" />
+    <PackageVersion Include="Microsoft.Maui.Controls.Compatibility" Version="10.0.50" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Debug" Version="10.0.5" />
+    <PackageVersion Include="sqlite-net-pcl" Version="1.9.172" />
+    <PackageVersion Include="SQLitePCLRaw.bundle_green" Version="2.1.11" />
+
+    <!-- Test project packages -->
+    <PackageVersion Include="coverlet.collector" Version="8.0.1" />
+    <PackageVersion Include="FluentAssertions" Version="8.9.0" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.3.0" />
+    <PackageVersion Include="NSubstitute" Version="5.3.0" />
+    <PackageVersion Include="xunit" Version="2.9.3" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5" />
+  </ItemGroup>
+
+</Project>

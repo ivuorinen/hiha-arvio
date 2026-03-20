@@ -464,13 +464,13 @@ HihaArvio.sln
 
 ## Technical Risks & Mitigations
 
-| Risk | Mitigation |
-|------|------------|
-| Accelerometer sensitivity varies by device | Adaptive normalization, user calibration option |
-| Web mouse simulation feels unnatural | Add tutorial/demo, support touch on mobile web |
-| SQLite performance with large history | Auto-prune, indexed queries, async operations |
-| .NET MAUI platform quirks | Thorough platform-specific testing, community resources |
-| Test coverage hard to reach 100% on Views | Keep Views minimal, test ViewModels exhaustively |
+| Risk                                       | Mitigation                                              |
+|--------------------------------------------|---------------------------------------------------------|
+| Accelerometer sensitivity varies by device | Adaptive normalization, user calibration option         |
+| Web mouse simulation feels unnatural       | Add tutorial/demo, support touch on mobile web          |
+| SQLite performance with large history      | Auto-prune, indexed queries, async operations           |
+| .NET MAUI platform quirks                  | Thorough platform-specific testing, community resources |
+| Test coverage hard to reach 100% on Views  | Keep Views minimal, test ViewModels exhaustively        |
 
 ---
 

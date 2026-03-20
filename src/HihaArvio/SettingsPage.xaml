@@ -99,11 +99,6 @@
                             </FormattedString>
                         </Label.FormattedText>
                     </Label>
-                    <Label Text="Easter Egg: Try shaking for more than 15 seconds..."
-                           FontSize="12"
-                           TextColor="{StaticResource Gray500}"
-                           FontAttributes="Italic"
-                           Margin="0,10,0,0"/>
                 </VerticalStackLayout>
             </Frame>
 

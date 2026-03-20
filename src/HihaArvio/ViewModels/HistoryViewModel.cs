@@ -29,23 +29,32 @@ public partial class HistoryViewModel : ObservableObject
     [RelayCommand]
     private async Task LoadHistoryAsync()
     {
-        var estimates = await _storageService.GetHistoryAsync();
-
-        History.Clear();
-        foreach (var estimate in estimates)
+        try
         {
-            History.Add(estimate);
-        }
+            var estimates = await _storageService.GetHistoryAsync();
 
-        IsEmpty = History.Count == 0;
+            History = new ObservableCollection<EstimateResult>(estimates);
+            IsEmpty = History.Count == 0;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Failed to load history: {ex.Message}");
+        }
     }
 
     [RelayCommand]
     private async Task ClearHistoryAsync()
     {
-        await _storageService.ClearHistoryAsync();
+        try
+        {
+            await _storageService.ClearHistoryAsync();
 
-        History.Clear();
-        IsEmpty = true;
+            History.Clear();
+            IsEmpty = true;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Failed to clear history: {ex.Message}");
+        }
     }
 }

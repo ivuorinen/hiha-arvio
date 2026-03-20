@@ -27,8 +27,8 @@ This specification covers:
 
 The application MUST be implemented using the following technologies:
 
-- **Framework:** .NET 8 Multi-platform App UI (MAUI)
-- **Language:** C# 12 with nullable reference types enabled
+- **Framework:** .NET 10 Multi-platform App UI (MAUI)
+- **Language:** C# 13 with nullable reference types enabled
 - **Minimum iOS version:** iOS 15.0
 - **Minimum macOS version:** macOS 12.0 (Monterey)
 - **Web target:** Blazor WebAssembly
@@ -340,10 +340,10 @@ The application MUST measure coverage using:
 
 **Multi-Target Framework Limitation:**
 
-Due to the multi-target framework architecture (net8.0, net8.0-ios, net8.0-maccatalyst), coverage enforcement has the following constraints:
+Due to the multi-target framework architecture (net10.0, net10.0-ios, net10.0-maccatalyst), coverage enforcement has the following constraints:
 
-- **Ubuntu CI runners**: Can only measure coverage for net8.0 target (~10-20% of codebase)
-  - Platform-specific code (iOS/macOS) is excluded from net8.0 builds
+- **Ubuntu CI runners**: Can only measure coverage for net10.0 target (~10-20% of codebase)
+  - Platform-specific code (iOS/macOS) is excluded from net10.0 builds
   - Coverage threshold enforcement is **disabled** on Linux runners
   - Coverage reports are generated for informational purposes only
 
@@ -536,7 +536,7 @@ The application SHOULD provide:
 
 The application MUST use the following NuGet packages:
 
-- `Microsoft.Maui.Controls` (≥8.0.0, <9.0.0)
+- `Microsoft.Maui.Controls` (≥10.0.0, <11.0.0)
 - `CommunityToolkit.Mvvm` (≥8.2.0)
 - `sqlite-net-pcl` (≥1.9.0)
 - `SQLitePCLRaw.bundle_green` (≥2.1.0)
@@ -639,9 +639,9 @@ For the application to be considered complete and ready for release, it MUST:
 
 ## Revision History
 
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 1.0 | 2025-11-18 | Claude Code | Initial specification document |
+| Version | Date       | Author      | Changes                        |
+|---------|------------|-------------|--------------------------------|
+| 1.0     | 2025-11-18 | Claude Code | Initial specification document |
 
 ---
 

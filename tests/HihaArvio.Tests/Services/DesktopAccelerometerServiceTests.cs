@@ -16,6 +16,9 @@ public class DesktopAccelerometerServiceTests : AccelerometerServiceContractTest
         return new DesktopAccelerometerService();
     }
 
+    /// <summary>
+    /// Verifies that a new desktop accelerometer service instance starts in a stopped state.
+    /// </summary>
     [Fact]
     public void Constructor_ShouldInitializeWithStoppedState()
     {
@@ -26,6 +29,9 @@ public class DesktopAccelerometerServiceTests : AccelerometerServiceContractTest
         // Service should be in stopped state initially
     }
 
+    /// <summary>
+    /// Verifies that the desktop accelerometer service is always reported as supported.
+    /// </summary>
     [Fact]
     public void IsSupported_ShouldReturnTrue()
     {
@@ -40,6 +46,9 @@ public class DesktopAccelerometerServiceTests : AccelerometerServiceContractTest
         isSupported.Should().BeTrue();
     }
 
+    /// <summary>
+    /// Verifies that calling Start multiple times does not throw an exception.
+    /// </summary>
     [Fact]
     public void Start_Multiple_ShouldNotThrow()
     {
@@ -60,6 +69,9 @@ public class DesktopAccelerometerServiceTests : AccelerometerServiceContractTest
         service.Stop();
     }
 
+    /// <summary>
+    /// Verifies that calling Stop multiple times does not throw an exception.
+    /// </summary>
     [Fact]
     public void Stop_Multiple_ShouldNotThrow()
     {
@@ -78,6 +90,9 @@ public class DesktopAccelerometerServiceTests : AccelerometerServiceContractTest
         act.Should().NotThrow();
     }
 
+    /// <summary>
+    /// Verifies that simulated sensor readings are emitted after starting the service.
+    /// </summary>
     [Fact]
     public async Task ReadingChanged_AfterStart_ShouldProvideSimulatedReadings()
     {
@@ -108,6 +123,9 @@ public class DesktopAccelerometerServiceTests : AccelerometerServiceContractTest
         service.Stop();
     }
 
+    /// <summary>
+    /// Verifies that sensor readings stop being generated after calling Stop.
+    /// </summary>
     [Fact]
     public async Task Stop_ShouldStopGeneratingReadings()
     {
@@ -118,8 +136,12 @@ public class DesktopAccelerometerServiceTests : AccelerometerServiceContractTest
         service.ReadingChanged += (sender, reading) => readingCount++;
 
         // Act
+        var firstReadingReceived = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        service.ReadingChanged += (sender, reading) =>
+            firstReadingReceived.TrySetResult(true);
+
         service.Start();
-        await Task.Delay(100); // Wait for several readings
+        await firstReadingReceived.Task.WaitAsync(TimeSpan.FromSeconds(2));
         var countBeforeStop = readingCount;
 
         service.Stop();

@@ -24,7 +24,7 @@ A playful Finnish take on agile estimation through shake gestures. Instead of po
 
 ## 🏗️ Architecture
 
-Built with **.NET 9 MAUI** using modern C# 13 and strict MVVM architecture:
+Built with **.NET 10 MAUI** using modern C# 13 and strict MVVM architecture:
 
 - **Models**: Core domain models (EstimateResult, ShakeData, AppSettings)
 - **Services**: Business logic layer
@@ -37,7 +37,7 @@ Built with **.NET 9 MAUI** using modern C# 13 and strict MVVM architecture:
 
 ### Technology Stack
 
-- **.NET 9.0** with C# 13
+- **.NET 10.0** with C# 13
 - **MAUI** for cross-platform UI
 - **CommunityToolkit.Mvvm** for MVVM patterns
 - **SQLite** (sqlite-net-pcl) for local storage
@@ -53,22 +53,22 @@ Comprehensive test suite covering all layers:
 
 ```bash
 # Run all tests
-dotnet test tests/HihaArvio.Tests/HihaArvio.Tests.csproj -f net9.0
+dotnet test tests/HihaArvio.Tests/HihaArvio.Tests.csproj -f net10.0
 
 # Run with detailed output
-dotnet test tests/HihaArvio.Tests/HihaArvio.Tests.csproj -f net9.0 --verbosity detailed
+dotnet test tests/HihaArvio.Tests/HihaArvio.Tests.csproj -f net10.0 --verbosity detailed
 
 # Generate coverage report
-dotnet test tests/HihaArvio.Tests/HihaArvio.Tests.csproj -f net9.0 --collect:"XPlat Code Coverage"
+dotnet test tests/HihaArvio.Tests/HihaArvio.Tests.csproj -f net10.0 --collect:"XPlat Code Coverage"
 ```
 
 ## 🚀 Getting Started
 
 ### Prerequisites
 
-- **.NET 9 SDK**: [Download here](https://dotnet.microsoft.com/download/dotnet/9.0)
+- **.NET 10 SDK**: [Download here](https://dotnet.microsoft.com/download/dotnet/10.0)
 - **MAUI Workload**: Install via `dotnet workload install maui`
-- **Xcode 15+**: Required for iOS/macOS builds (macOS only)
+- **Xcode 26+**: Required for iOS/macOS builds (macOS only)
 - **Visual Studio 2022** or **VS Code** with C# extension
 
 ### Installation
@@ -85,19 +85,19 @@ dotnet restore HihaArvio.sln
 dotnet build HihaArvio.sln -c Release
 
 # Run tests
-dotnet test tests/HihaArvio.Tests/HihaArvio.Tests.csproj -f net9.0
+dotnet test tests/HihaArvio.Tests/HihaArvio.Tests.csproj -f net10.0
 ```
 
 ### Running the App
 
 ```bash
 # iOS Simulator
-dotnet build src/HihaArvio/HihaArvio.csproj -f net9.0-ios -c Debug
+dotnet build src/HihaArvio/HihaArvio.csproj -f net10.0-ios -c Debug
 # Then deploy via Xcode or Visual Studio
 
 # macOS Catalyst
-dotnet build src/HihaArvio/HihaArvio.csproj -f net9.0-maccatalyst -c Debug
-# Then run the .app bundle from bin/Debug/net9.0-maccatalyst/
+dotnet build src/HihaArvio/HihaArvio.csproj -f net10.0-maccatalyst -c Debug
+# Then run the .app bundle from bin/Debug/net10.0-maccatalyst/
 ```
 
 ## 📦 CI/CD Workflows
@@ -181,13 +181,13 @@ hiha-arvio/
 ```bash
 # iOS
 dotnet publish src/HihaArvio/HihaArvio.csproj \
-  -f net9.0-ios \
+  -f net10.0-ios \
   -c Release \
   /p:ArchiveOnBuild=true
 
 # macOS Catalyst
 dotnet publish src/HihaArvio/HihaArvio.csproj \
-  -f net9.0-maccatalyst \
+  -f net10.0-maccatalyst \
   -c Release \
   /p:ArchiveOnBuild=true
 ```

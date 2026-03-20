@@ -14,7 +14,7 @@ The following rules are derived from CLAUDE.md and additional Copilot-specific c
 
 ### Language & Framework
 
-- **Target framework:** .NET 9, using C# 13
+- **Target framework:** .NET 10, using C# 13
 - **UI framework:** .NET MAUI (multi-platform)
 - **Nullable reference types MUST be enabled** across all projects
 - **All compiler warnings MUST be treated as errors** (`<TreatWarningsAsErrors>true</TreatWarningsAsErrors>`)
@@ -58,20 +58,20 @@ The following rules are derived from CLAUDE.md and additional Copilot-specific c
 
 | Component | Version |
 |---|---|
-| .NET SDK | 9.0.x |
+| .NET SDK | v10 |
 | C# Language | 13 |
-| Microsoft.Maui.Controls | 9.0.120 |
-| Microsoft.Maui.Controls.Compatibility | 9.0.120 |
-| CommunityToolkit.Mvvm | 8.4.0 |
+| Microsoft.Maui.Controls | v10 |
+| Microsoft.Maui.Controls.Compatibility | v10 |
+| CommunityToolkit.Mvvm | 8.4.1 |
 | SQLite (sqlite-net-pcl) | 1.9.172 |
 | SQLitePCLRaw.bundle_green | 2.1.11 |
-| Microsoft.Extensions.Logging.Debug | 9.0.13 |
+| Microsoft.Extensions.Logging.Debug | v10 |
 | xUnit | 2.9.3 |
-| xunit.runner.visualstudio | 2.8.2 |
+| xunit.runner.visualstudio | 3.1.5 |
 | Microsoft.NET.Test.Sdk | 18.3.0 |
 | NSubstitute | 5.3.0 |
-| FluentAssertions | 8.8.0 |
-| coverlet.collector | 8.0.0 |
+| FluentAssertions | 8.9.0 |
+| coverlet.collector | 8.0.1 |
 
 ## Key Files
 
