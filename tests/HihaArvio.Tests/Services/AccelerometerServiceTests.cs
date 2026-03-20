@@ -10,6 +10,9 @@ namespace HihaArvio.Tests.Services;
 /// </summary>
 public class AccelerometerServiceContractTests
 {
+    /// <summary>
+    /// Verifies that SensorReading exposes X, Y, and Z axis properties with correct values.
+    /// </summary>
     [Fact]
     public void SensorReading_ShouldHaveXYZProperties()
     {
@@ -27,6 +30,9 @@ public class AccelerometerServiceContractTests
         data.Z.Should().Be(3.5);
     }
 
+    /// <summary>
+    /// Verifies that SensorReading properties are init-only and retain their assigned values.
+    /// </summary>
     [Fact]
     public void SensorReading_ShouldBeInitOnly()
     {
@@ -37,6 +43,9 @@ public class AccelerometerServiceContractTests
         data.X.Should().Be(1.0);
     }
 
+    /// <summary>
+    /// Verifies that SensorReading supports value-based equality comparison.
+    /// </summary>
     [Fact]
     public void SensorReading_ShouldSupportEqualityComparison()
     {
@@ -63,6 +72,9 @@ public abstract class AccelerometerServiceContractTestsBase
     /// </summary>
     protected abstract IAccelerometerService CreateService();
 
+    /// <summary>
+    /// Verifies that Start can be called without throwing on any implementation.
+    /// </summary>
     [Fact]
     public void Start_ShouldEnableMonitoring()
     {
@@ -77,6 +89,9 @@ public abstract class AccelerometerServiceContractTestsBase
         // This is a smoke test - platform implementations will have more specific tests
     }
 
+    /// <summary>
+    /// Verifies that Stop can be called after Start without throwing.
+    /// </summary>
     [Fact]
     public void Stop_ShouldDisableMonitoring()
     {
@@ -92,6 +107,9 @@ public abstract class AccelerometerServiceContractTestsBase
         // This is a smoke test - platform implementations will have more specific tests
     }
 
+    /// <summary>
+    /// Verifies that calling Stop without a prior Start does not throw an exception.
+    /// </summary>
     [Fact]
     public void Stop_WhenNotStarted_ShouldNotThrow()
     {
@@ -105,6 +123,9 @@ public abstract class AccelerometerServiceContractTestsBase
         act.Should().NotThrow();
     }
 
+    /// <summary>
+    /// Verifies that IsSupported returns a valid boolean value.
+    /// </summary>
     [Fact]
     public void IsSupported_ShouldReturnBoolean()
     {
@@ -118,6 +139,9 @@ public abstract class AccelerometerServiceContractTestsBase
         isSupported.Should().Be(isSupported); // Just verify it's a boolean value
     }
 
+    /// <summary>
+    /// Verifies that subscribing to the ReadingChanged event does not throw.
+    /// </summary>
     [Fact]
     public void ReadingChanged_ShouldNotBeNull()
     {

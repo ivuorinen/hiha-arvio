@@ -108,6 +108,9 @@ public partial class MainViewModel : ObservableObject, IDisposable
         _shakeDetectionService.Reset();
     }
 
+    /// <summary>
+    /// Unsubscribes from shake events and stops accelerometer monitoring.
+    /// </summary>
     public void Dispose()
     {
         // Unsubscribe from events

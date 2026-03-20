@@ -1,0 +1,22 @@
+name: Setup MAUI Build Environment
+description: Checkout code, setup .NET SDK from global.json, select Xcode version, and restore MAUI workloads
+
+runs:
+  using: composite
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7 # v5.2.0
+      with:
+        global-json-file: global.json
+
+    - name: Select Xcode version
+      uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1.7.0
+      with:
+        xcode-version: '26.2'
+
+    - name: Restore workloads
+      shell: bash
+      run: dotnet workload restore src/HihaArvio/HihaArvio.csproj

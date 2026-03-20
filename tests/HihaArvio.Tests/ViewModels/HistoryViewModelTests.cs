@@ -7,6 +7,9 @@ using NSubstitute;
 
 namespace HihaArvio.Tests.ViewModels;
 
+/// <summary>
+/// Tests for the HistoryViewModel covering initialization, history loading, clearing, property change notifications, and observable collection behavior.
+/// </summary>
 public class HistoryViewModelTests
 {
     private readonly IStorageService _storageService;
@@ -20,6 +23,9 @@ public class HistoryViewModelTests
 
     #region Initialization Tests
 
+    /// <summary>
+    /// Verifies that the history collection is empty on initialization.
+    /// </summary>
     [Fact]
     public void Constructor_ShouldInitializeWithEmptyHistory()
     {
@@ -28,6 +34,9 @@ public class HistoryViewModelTests
         _viewModel.History.Should().BeEmpty();
     }
 
+    /// <summary>
+    /// Verifies that IsEmpty is true when no history has been loaded.
+    /// </summary>
     [Fact]
     public void Constructor_ShouldInitializeIsEmptyAsTrue()
     {
@@ -35,6 +44,9 @@ public class HistoryViewModelTests
         _viewModel.IsEmpty.Should().BeTrue();
     }
 
+    /// <summary>
+    /// Verifies that the LoadHistoryCommand is initialized.
+    /// </summary>
     [Fact]
     public void Constructor_ShouldHaveLoadHistoryCommand()
     {
@@ -42,6 +54,9 @@ public class HistoryViewModelTests
         _viewModel.LoadHistoryCommand.Should().NotBeNull();
     }
 
+    /// <summary>
+    /// Verifies that the ClearHistoryCommand is initialized.
+    /// </summary>
     [Fact]
     public void Constructor_ShouldHaveClearHistoryCommand()
     {
@@ -53,6 +68,9 @@ public class HistoryViewModelTests
 
     #region Load History Tests
 
+    /// <summary>
+    /// Verifies that executing LoadHistoryCommand calls the storage service.
+    /// </summary>
     [Fact]
     public async Task LoadHistoryCommand_ShouldLoadHistoryFromStorage()
     {
@@ -71,6 +89,9 @@ public class HistoryViewModelTests
         await _storageService.Received(1).GetHistoryAsync(Arg.Any<int>());
     }
 
+    /// <summary>
+    /// Verifies that loaded estimates populate the History collection.
+    /// </summary>
     [Fact]
     public async Task LoadHistoryCommand_ShouldPopulateHistoryCollection()
     {
@@ -93,6 +114,9 @@ public class HistoryViewModelTests
         _viewModel.History[2].EstimateText.Should().Be("3 months");
     }
 
+    /// <summary>
+    /// Verifies that IsEmpty is true when no estimates are returned.
+    /// </summary>
     [Fact]
     public async Task LoadHistoryCommand_WhenHistoryEmpty_ShouldSetIsEmptyToTrue()
     {
@@ -106,6 +130,9 @@ public class HistoryViewModelTests
         _viewModel.IsEmpty.Should().BeTrue();
     }
 
+    /// <summary>
+    /// Verifies that IsEmpty is false when estimates are loaded.
+    /// </summary>
     [Fact]
     public async Task LoadHistoryCommand_WhenHistoryHasItems_ShouldSetIsEmptyToFalse()
     {
@@ -123,6 +150,9 @@ public class HistoryViewModelTests
         _viewModel.IsEmpty.Should().BeFalse();
     }
 
+    /// <summary>
+    /// Verifies that subsequent loads replace the previous history collection.
+    /// </summary>
     [Fact]
     public async Task LoadHistoryCommand_CalledMultipleTimes_ShouldReplaceHistory()
     {
@@ -154,6 +184,9 @@ public class HistoryViewModelTests
 
     #region Clear History Tests
 
+    /// <summary>
+    /// Verifies that executing ClearHistoryCommand calls the storage service.
+    /// </summary>
     [Fact]
     public async Task ClearHistoryCommand_ShouldCallStorageServiceClear()
     {
@@ -164,6 +197,9 @@ public class HistoryViewModelTests
         await _storageService.Received(1).ClearHistoryAsync();
     }
 
+    /// <summary>
+    /// Verifies that clearing removes all items from the History collection.
+    /// </summary>
     [Fact]
     public async Task ClearHistoryCommand_ShouldClearHistoryCollection()
     {
@@ -184,6 +220,9 @@ public class HistoryViewModelTests
         _viewModel.History.Should().BeEmpty();
     }
 
+    /// <summary>
+    /// Verifies that IsEmpty becomes true after clearing history.
+    /// </summary>
     [Fact]
     public async Task ClearHistoryCommand_ShouldSetIsEmptyToTrue()
     {
@@ -207,6 +246,9 @@ public class HistoryViewModelTests
 
     #region Property Change Notification Tests
 
+    /// <summary>
+    /// Verifies that the ObservableCollection fires CollectionChanged events when loaded.
+    /// </summary>
     [Fact]
     public async Task History_WhenLoadHistoryCalled_ShouldPopulateCollection()
     {
@@ -228,6 +270,9 @@ public class HistoryViewModelTests
         _viewModel.History.Should().HaveCount(1);
     }
 
+    /// <summary>
+    /// Verifies that changing IsEmpty raises PropertyChanged notifications.
+    /// </summary>
     [Fact]
     public async Task IsEmpty_WhenChanged_ShouldRaisePropertyChanged()
     {
@@ -257,6 +302,9 @@ public class HistoryViewModelTests
 
     #region Observable Collection Tests
 
+    /// <summary>
+    /// Verifies that History is an ObservableCollection for UI binding support.
+    /// </summary>
     [Fact]
     public void History_ShouldBeObservableCollection()
     {

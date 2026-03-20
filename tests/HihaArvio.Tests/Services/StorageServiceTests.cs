@@ -5,6 +5,9 @@ using HihaArvio.Services.Interfaces;
 
 namespace HihaArvio.Tests.Services;
 
+/// <summary>
+/// Tests for the StorageService covering settings persistence, estimate history CRUD operations, auto-pruning, and edge cases.
+/// </summary>
 public class StorageServiceTests : IDisposable
 {
     private readonly IStorageService _service;
@@ -28,6 +31,9 @@ public class StorageServiceTests : IDisposable
 
     #region Settings Tests
 
+    /// <summary>
+    /// Verifies that default settings are returned when no settings have been saved.
+    /// </summary>
     [Fact]
     public async Task LoadSettingsAsync_WhenNoSettingsExist_ShouldReturnDefaultSettings()
     {
@@ -40,6 +46,9 @@ public class StorageServiceTests : IDisposable
         settings.MaxHistorySize.Should().Be(10);
     }
 
+    /// <summary>
+    /// Verifies that saved settings can be loaded back correctly.
+    /// </summary>
     [Fact]
     public async Task SaveAndLoadSettings_ShouldPersistSettings()
     {
@@ -59,6 +68,9 @@ public class StorageServiceTests : IDisposable
         loadedSettings.MaxHistorySize.Should().Be(20);
     }
 
+    /// <summary>
+    /// Verifies that saving settings multiple times overwrites previous values.
+    /// </summary>
     [Fact]
     public async Task SaveSettings_MultipleTimes_ShouldOverwritePreviousSettings()
     {
@@ -80,6 +92,9 @@ public class StorageServiceTests : IDisposable
 
     #region Estimate History Tests
 
+    /// <summary>
+    /// Verifies that a saved estimate can be retrieved from history.
+    /// </summary>
     [Fact]
     public async Task SaveEstimateAsync_ShouldPersistEstimate()
     {
@@ -100,6 +115,9 @@ public class StorageServiceTests : IDisposable
         saved.ShakeDuration.Should().Be(TimeSpan.FromSeconds(5));
     }
 
+    /// <summary>
+    /// Verifies that an empty history returns an empty list.
+    /// </summary>
     [Fact]
     public async Task GetHistoryAsync_WhenEmpty_ShouldReturnEmptyList()
     {
@@ -110,6 +128,9 @@ public class StorageServiceTests : IDisposable
         history.Should().BeEmpty();
     }
 
+    /// <summary>
+    /// Verifies that history is returned in reverse chronological order.
+    /// </summary>
     [Fact]
     public async Task GetHistoryAsync_ShouldReturnNewestFirst()
     {
@@ -133,6 +154,9 @@ public class StorageServiceTests : IDisposable
         history[2].EstimateText.Should().Be("1 day");  // Oldest
     }
 
+    /// <summary>
+    /// Verifies that the count parameter limits the number of returned results.
+    /// </summary>
     [Fact]
     public async Task GetHistoryAsync_WithCount_ShouldLimitResults()
     {
@@ -151,6 +175,9 @@ public class StorageServiceTests : IDisposable
         history.Should().HaveCount(5);
     }
 
+    /// <summary>
+    /// Verifies that history is automatically pruned when it exceeds MaxHistorySize.
+    /// </summary>
     [Fact]
     public async Task SaveEstimateAsync_ShouldAutoPruneWhenExceedingMaxSize()
     {
@@ -172,6 +199,9 @@ public class StorageServiceTests : IDisposable
         count.Should().Be(5);
     }
 
+    /// <summary>
+    /// Verifies that auto-pruning retains the most recent estimates.
+    /// </summary>
     [Fact]
     public async Task SaveEstimateAsync_AfterPruning_ShouldKeepNewestEstimates()
     {
@@ -197,6 +227,9 @@ public class StorageServiceTests : IDisposable
         // "0 days" and "1 days" should be pruned
     }
 
+    /// <summary>
+    /// Verifies that clearing history removes all stored estimates.
+    /// </summary>
     [Fact]
     public async Task ClearHistoryAsync_ShouldRemoveAllEstimates()
     {
@@ -215,6 +248,9 @@ public class StorageServiceTests : IDisposable
         count.Should().Be(0);
     }
 
+    /// <summary>
+    /// Verifies that the history count accurately reflects the number of stored estimates.
+    /// </summary>
     [Fact]
     public async Task GetHistoryCountAsync_ShouldReturnCorrectCount()
     {
@@ -236,6 +272,9 @@ public class StorageServiceTests : IDisposable
 
     #region Edge Cases
 
+    /// <summary>
+    /// Verifies that estimates with special characters are persisted correctly.
+    /// </summary>
     [Fact]
     public async Task SaveEstimateAsync_WithSpecialCharacters_ShouldPersist()
     {
@@ -251,6 +290,9 @@ public class StorageServiceTests : IDisposable
         history[0].EstimateText.Should().Be("when hell freezes over");
     }
 
+    /// <summary>
+    /// Verifies that requesting zero items returns an empty list.
+    /// </summary>
     [Fact]
     public async Task GetHistoryAsync_WithCountZero_ShouldReturnEmptyList()
     {
@@ -265,6 +307,9 @@ public class StorageServiceTests : IDisposable
         history.Should().BeEmpty();
     }
 
+    /// <summary>
+    /// Verifies that a negative count parameter returns an empty list.
+    /// </summary>
     [Fact]
     public async Task GetHistoryAsync_WithNegativeCount_ShouldReturnEmptyList()
     {

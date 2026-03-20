@@ -1,0 +1,20 @@
+name: Get Version
+description: Extract version from tag ref or workflow_dispatch input
+
+outputs:
+  version:
+    description: The resolved version string (without leading 'v')
+    value: ${{ steps.get_version.outputs.version }}
+
+runs:
+  using: composite
+  steps:
+    - name: Get version
+      id: get_version
+      shell: bash
+      run: |
+        if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+          echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+        else
+          echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+        fi

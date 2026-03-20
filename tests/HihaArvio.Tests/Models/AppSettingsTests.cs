@@ -3,8 +3,14 @@ using HihaArvio.Models;
 
 namespace HihaArvio.Tests.Models;
 
+/// <summary>
+/// Tests for the <see cref="AppSettings"/> model, verifying default values, property assignment, and validation.
+/// </summary>
 public class AppSettingsTests
 {
+    /// <summary>
+    /// Verifies that the default constructor sets SelectedMode to Work.
+    /// </summary>
     [Fact]
     public void AppSettings_DefaultConstructor_ShouldSetWorkModeAsDefault()
     {
@@ -15,6 +21,9 @@ public class AppSettingsTests
         settings.SelectedMode.Should().Be(EstimateMode.Work);
     }
 
+    /// <summary>
+    /// Verifies that the default constructor sets MaxHistorySize to 10.
+    /// </summary>
     [Fact]
     public void AppSettings_DefaultConstructor_ShouldSetMaxHistorySizeTo10()
     {
@@ -25,6 +34,9 @@ public class AppSettingsTests
         settings.MaxHistorySize.Should().Be(10);
     }
 
+    /// <summary>
+    /// Verifies that SelectedMode can be changed to any valid EstimateMode value.
+    /// </summary>
     [Theory]
     [InlineData(EstimateMode.Work)]
     [InlineData(EstimateMode.Generic)]
@@ -41,6 +53,9 @@ public class AppSettingsTests
         settings.SelectedMode.Should().Be(mode);
     }
 
+    /// <summary>
+    /// Verifies that MaxHistorySize accepts valid positive integer values.
+    /// </summary>
     [Theory]
     [InlineData(1)]
     [InlineData(5)]
@@ -59,6 +74,9 @@ public class AppSettingsTests
         settings.MaxHistorySize.Should().Be(size);
     }
 
+    /// <summary>
+    /// Verifies that MaxHistorySize throws ArgumentOutOfRangeException for zero or negative values.
+    /// </summary>
     [Theory]
     [InlineData(0)]
     [InlineData(-1)]
@@ -76,6 +94,9 @@ public class AppSettingsTests
             .WithMessage("*must be greater than 0*");
     }
 
+    /// <summary>
+    /// Verifies that a newly created AppSettings instance has all expected default values.
+    /// </summary>
     [Fact]
     public void AppSettings_ShouldCreateWithDefaultValues()
     {

@@ -639,9 +639,9 @@ For the application to be considered complete and ready for release, it MUST:
 
 ## Revision History
 
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 1.0 | 2025-11-18 | Claude Code | Initial specification document |
+| Version | Date       | Author      | Changes                        |
+|---------|------------|-------------|--------------------------------|
+| 1.0     | 2025-11-18 | Claude Code | Initial specification document |
 
 ---
 

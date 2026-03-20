@@ -5,6 +5,10 @@ using HihaArvio.Services.Interfaces;
 
 namespace HihaArvio.Tests.Services;
 
+/// <summary>
+/// Tests for EstimateService covering easter egg behavior, pool selection,
+/// expanded pool sizes, result metadata, and edge cases.
+/// </summary>
 public class EstimateServiceTests
 {
     private readonly IEstimateService _service;
@@ -16,6 +20,9 @@ public class EstimateServiceTests
 
     #region Easter Egg Tests (>15 seconds → Humorous mode)
 
+    /// <summary>
+    /// Verifies that shaking longer than 15 seconds forces Humorous mode (easter egg).
+    /// </summary>
     [Fact]
     public void GenerateEstimate_WhenDurationExceeds15Seconds_ShouldForceHumorousMode()
     {
@@ -31,6 +38,9 @@ public class EstimateServiceTests
         result.EstimateText.Should().NotBeNullOrEmpty();
     }
 
+    /// <summary>
+    /// Verifies that exactly 15 seconds of shaking does not trigger the easter egg.
+    /// </summary>
     [Fact]
     public void GenerateEstimate_WhenDurationExactly15Seconds_ShouldNotTriggerEasterEgg()
     {
@@ -44,6 +54,9 @@ public class EstimateServiceTests
         result.Mode.Should().Be(EstimateMode.Work);
     }
 
+    /// <summary>
+    /// Verifies that durations below the easter egg threshold preserve the requested mode.
+    /// </summary>
     [Fact]
     public void GenerateEstimate_WhenDurationBelowThreshold_ShouldRespectOriginalMode()
     {
@@ -61,6 +74,9 @@ public class EstimateServiceTests
 
     #region Two-Pool Selection Tests (Per Spec: Gentle vs Hard)
 
+    /// <summary>
+    /// Verifies that intensity below 0.5 selects estimates from the gentle pool.
+    /// </summary>
     [Theory]
     [InlineData(0.0, EstimateMode.Work)]  // Lowest intensity → gentle pool
     [InlineData(0.1, EstimateMode.Work)]
@@ -92,6 +108,9 @@ public class EstimateServiceTests
         uniqueEstimates.Should().BeGreaterThan(5, "gentle pool should have variety");
     }
 
+    /// <summary>
+    /// Verifies that intensity at or above 0.5 selects estimates from the hard pool.
+    /// </summary>
     [Theory]
     [InlineData(0.5, EstimateMode.Work)]  // At threshold → hard pool
     [InlineData(0.6, EstimateMode.Work)]
@@ -123,6 +142,9 @@ public class EstimateServiceTests
         uniqueEstimates.Should().BeGreaterThan(10, "hard pool should have extensive variety");
     }
 
+    /// <summary>
+    /// Verifies that the 0.5 intensity threshold produces distinct selections from gentle and hard pools.
+    /// </summary>
     [Fact]
     public void GenerateEstimate_ThresholdAt0Point5_ShouldProduceDistinctPoolSelections()
     {
@@ -155,6 +177,9 @@ public class EstimateServiceTests
 
     #region Expanded Pool Tests (5x Spec)
 
+    /// <summary>
+    /// Verifies that Work mode gentle and hard pools contain the expected expanded number of estimates.
+    /// </summary>
     [Fact]
     public void GenerateEstimate_WorkMode_ShouldHaveExpandedPoolSize()
     {
@@ -180,6 +205,9 @@ public class EstimateServiceTests
         hardResults.Should().BeGreaterThan(30, "Work hard pool should have expanded size");
     }
 
+    /// <summary>
+    /// Verifies that Generic mode gentle and hard pools contain the expected expanded number of estimates.
+    /// </summary>
     [Fact]
     public void GenerateEstimate_GenericMode_ShouldHaveExpandedPoolSize()
     {
@@ -205,6 +233,9 @@ public class EstimateServiceTests
         hardResults.Should().BeGreaterThan(35, "Generic hard pool should have expanded size");
     }
 
+    /// <summary>
+    /// Verifies that Humorous mode pool contains the expected expanded number of estimates.
+    /// </summary>
     [Fact]
     public void GenerateEstimate_HumorousMode_ShouldHaveExpandedPoolSize()
     {
@@ -226,6 +257,9 @@ public class EstimateServiceTests
 
     #region EstimateResult Metadata Tests
 
+    /// <summary>
+    /// Verifies that all EstimateResult properties are correctly populated after generation.
+    /// </summary>
     [Fact]
     public void GenerateEstimate_ShouldSetAllEstimateResultProperties()
     {
@@ -248,6 +282,9 @@ public class EstimateServiceTests
         result.ShakeDuration.Should().Be(duration);
     }
 
+    /// <summary>
+    /// Verifies that each generated estimate receives a unique identifier.
+    /// </summary>
     [Fact]
     public void GenerateEstimate_ShouldGenerateUniqueIds()
     {
@@ -259,6 +296,9 @@ public class EstimateServiceTests
         result1.Id.Should().NotBe(result2.Id);
     }
 
+    /// <summary>
+    /// Verifies that repeated calls produce varied (non-deterministic) estimate texts.
+    /// </summary>
     [Fact]
     public void GenerateEstimate_ShouldProduceRandomResults()
     {
@@ -273,6 +313,9 @@ public class EstimateServiceTests
         uniqueCount.Should().BeGreaterThan(5, "service should produce varied random results");
     }
 
+    /// <summary>
+    /// Verifies that the RNG produces a reasonably uniform distribution across the estimate pool.
+    /// </summary>
     [Fact]
     public void GenerateEstimate_ShouldUseCryptographicallySecureRNG()
     {
@@ -296,6 +339,9 @@ public class EstimateServiceTests
 
     #region Edge Cases
 
+    /// <summary>
+    /// Verifies that zero intensity produces a valid estimate from the gentle pool.
+    /// </summary>
     [Fact]
     public void GenerateEstimate_WithZeroIntensity_ShouldWork()
     {
@@ -308,6 +354,9 @@ public class EstimateServiceTests
         result.ShakeIntensity.Should().Be(0.0);
     }
 
+    /// <summary>
+    /// Verifies that maximum intensity (1.0) produces a valid estimate from the hard pool.
+    /// </summary>
     [Fact]
     public void GenerateEstimate_WithMaxIntensity_ShouldWork()
     {
@@ -320,6 +369,9 @@ public class EstimateServiceTests
         result.ShakeIntensity.Should().Be(1.0);
     }
 
+    /// <summary>
+    /// Verifies that zero duration produces a valid estimate without triggering the easter egg.
+    /// </summary>
     [Fact]
     public void GenerateEstimate_WithZeroDuration_ShouldWork()
     {
@@ -331,6 +383,9 @@ public class EstimateServiceTests
         result.ShakeDuration.Should().Be(TimeSpan.Zero);
     }
 
+    /// <summary>
+    /// Verifies that all EstimateMode enum values produce valid estimates.
+    /// </summary>
     [Fact]
     public void GenerateEstimate_AllModes_ShouldReturnValidEstimates()
     {

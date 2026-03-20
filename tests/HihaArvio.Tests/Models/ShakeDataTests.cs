@@ -3,8 +3,14 @@ using HihaArvio.Models;
 
 namespace HihaArvio.Tests.Models;
 
+/// <summary>
+/// Tests for the <see cref="ShakeData"/> model, verifying construction, property validation, and default values.
+/// </summary>
 public class ShakeDataTests
 {
+    /// <summary>
+    /// Verifies that all properties are correctly assigned during object initialization.
+    /// </summary>
     [Fact]
     public void ShakeData_ShouldCreateWithAllProperties()
     {
@@ -27,6 +33,9 @@ public class ShakeDataTests
         shakeData.IsShaking.Should().Be(isShaking);
     }
 
+    /// <summary>
+    /// Verifies that Intensity accepts valid values within the 0.0 to 1.0 range.
+    /// </summary>
     [Theory]
     [InlineData(0.0)]
     [InlineData(0.25)]
@@ -42,6 +51,9 @@ public class ShakeDataTests
         shakeData.Intensity.Should().Be(intensity);
     }
 
+    /// <summary>
+    /// Verifies that Intensity throws ArgumentOutOfRangeException for values outside 0.0 to 1.0.
+    /// </summary>
     [Theory]
     [InlineData(-0.1)]
     [InlineData(-1.0)]
@@ -57,6 +69,9 @@ public class ShakeDataTests
             .WithMessage("*must be between 0.0 and 1.0*");
     }
 
+    /// <summary>
+    /// Verifies that Duration accepts a zero TimeSpan value.
+    /// </summary>
     [Fact]
     public void ShakeData_ShouldAcceptZeroDuration()
     {
@@ -67,6 +82,9 @@ public class ShakeDataTests
         shakeData.Duration.Should().Be(TimeSpan.Zero);
     }
 
+    /// <summary>
+    /// Verifies that Duration accepts a positive TimeSpan value.
+    /// </summary>
     [Fact]
     public void ShakeData_ShouldAcceptPositiveDuration()
     {
@@ -80,6 +98,9 @@ public class ShakeDataTests
         shakeData.Duration.Should().Be(duration);
     }
 
+    /// <summary>
+    /// Verifies that IsShaking accepts both true and false values.
+    /// </summary>
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
@@ -92,6 +113,9 @@ public class ShakeDataTests
         shakeData.IsShaking.Should().Be(isShaking);
     }
 
+    /// <summary>
+    /// Verifies that the default constructor initializes all properties to their default values.
+    /// </summary>
     [Fact]
     public void ShakeData_DefaultConstructor_ShouldSetDefaultValues()
     {

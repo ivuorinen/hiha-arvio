@@ -16,21 +16,8 @@ jobs:
       actions: write
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-
-    - name: Setup .NET
-      uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7 # v5.2.0
-      with:
-        dotnet-version: '10.0.x'
-
-    - name: Select Xcode version
-      uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1.7.0
-      with:
-        xcode-version: '26.0'
-
-    - name: Restore workloads
-      run: dotnet workload restore src/HihaArvio/HihaArvio.csproj
+    - name: Setup MAUI build environment
+      uses: ./.github/actions/setup-maui
 
     - name: Build iOS
       run: dotnet build src/HihaArvio/HihaArvio.csproj -f net10.0-ios -c Release /p:ArchiveOnBuild=false /p:EnableCodeSigning=false
@@ -52,21 +39,8 @@ jobs:
       actions: write
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-
-    - name: Setup .NET
-      uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7 # v5.2.0
-      with:
-        dotnet-version: '10.0.x'
-
-    - name: Select Xcode version
-      uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1.7.0
-      with:
-        xcode-version: '26.0'
-
-    - name: Restore workloads
-      run: dotnet workload restore src/HihaArvio/HihaArvio.csproj
+    - name: Setup MAUI build environment
+      uses: ./.github/actions/setup-maui
 
     - name: Build macOS Catalyst
       run: dotnet build src/HihaArvio/HihaArvio.csproj -f net10.0-maccatalyst -c Release /p:ArchiveOnBuild=false /p:EnableCodeSigning=false
@@ -91,10 +65,10 @@ jobs:
     - name: Check build status
       run: |
         if [[ "${{ needs.build-ios.result }}" == "success" ]] && [[ "${{ needs.build-maccatalyst.result }}" == "success" ]]; then
-          echo "✅ All builds succeeded"
+          echo "All builds succeeded"
           exit 0
         else
-          echo "❌ One or more builds failed"
+          echo "One or more builds failed"
           echo "iOS: ${{ needs.build-ios.result }}"
           echo "macOS Catalyst: ${{ needs.build-maccatalyst.result }}"
           exit 1

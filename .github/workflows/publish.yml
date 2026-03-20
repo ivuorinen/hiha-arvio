@@ -11,9 +11,6 @@ on:
         required: true
         type: string
 
-env:
-  DOTNET_VERSION: '10.0.x'
-
 jobs:
   build-ios:
     name: Build iOS
@@ -23,30 +20,12 @@ jobs:
       actions: write
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+    - name: Setup MAUI build environment
+      uses: ./.github/actions/setup-maui
 
     - name: Get version
       id: get_version
-      run: |
-        if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-          echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
-        else
-          echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
-        fi
-
-    - name: Setup .NET
-      uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7 # v5.2.0
-      with:
-        dotnet-version: ${{ env.DOTNET_VERSION }}
-
-    - name: Select Xcode version
-      uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1.7.0
-      with:
-        xcode-version: '26.0'
-
-    - name: Restore workloads
-      run: dotnet workload restore src/HihaArvio/HihaArvio.csproj
+      uses: ./.github/actions/get-version
 
     - name: Build iOS Release
       run: |
@@ -59,16 +38,17 @@ jobs:
           /p:EnableCodeSigning=false
 
     - name: Create iOS artifact archive
+      env:
+        VERSION: ${{ steps.get_version.outputs.version }}
       run: |
         cd src/HihaArvio/bin/Release/net10.0-ios
-        # Find the .app bundle (it's in a subdirectory like iossimulator-arm64 or ios-arm64)
         APP_PATH=$(find . -name "*.app" -type d | head -n 1)
         if [ -z "$APP_PATH" ]; then
           echo "Error: No .app bundle found"
           exit 1
         fi
-        zip -r HihaArvio-iOS-${{ steps.get_version.outputs.version }}.zip "$APP_PATH"
-        mv HihaArvio-iOS-${{ steps.get_version.outputs.version }}.zip ${{ github.workspace }}/
+        zip -r "HihaArvio-iOS-${VERSION}.zip" "$APP_PATH"
+        mv "HihaArvio-iOS-${VERSION}.zip" "${{ github.workspace }}/"
 
     - name: Upload iOS artifact
       uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
@@ -85,30 +65,12 @@ jobs:
       actions: write
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+    - name: Setup MAUI build environment
+      uses: ./.github/actions/setup-maui
 
     - name: Get version
       id: get_version
-      run: |
-        if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-          echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
-        else
-          echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
-        fi
-
-    - name: Setup .NET
-      uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7 # v5.2.0
-      with:
-        dotnet-version: ${{ env.DOTNET_VERSION }}
-
-    - name: Select Xcode version
-      uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1.7.0
-      with:
-        xcode-version: '26.0'
-
-    - name: Restore workloads
-      run: dotnet workload restore src/HihaArvio/HihaArvio.csproj
+      uses: ./.github/actions/get-version
 
     - name: Build macOS Catalyst Release
       run: |
@@ -121,16 +83,17 @@ jobs:
           /p:EnableCodeSigning=false
 
     - name: Create macOS artifact archive
+      env:
+        VERSION: ${{ steps.get_version.outputs.version }}
       run: |
         cd src/HihaArvio/bin/Release/net10.0-maccatalyst
-        # Find the .app bundle (it's in a subdirectory like maccatalyst-x64 or maccatalyst-arm64)
         APP_PATH=$(find . -name "*.app" -type d | head -n 1)
         if [ -z "$APP_PATH" ]; then
           echo "Error: No .app bundle found"
           exit 1
         fi
-        zip -r HihaArvio-macOS-${{ steps.get_version.outputs.version }}.zip "$APP_PATH"
-        mv HihaArvio-macOS-${{ steps.get_version.outputs.version }}.zip ${{ github.workspace }}/
+        zip -r "HihaArvio-macOS-${VERSION}.zip" "$APP_PATH"
+        mv "HihaArvio-macOS-${VERSION}.zip" "${{ github.workspace }}/"
 
     - name: Upload macOS artifact
       uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
@@ -156,29 +119,28 @@ jobs:
 
     - name: Get version
       id: get_version
-      run: |
-        if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-          echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
-        else
-          echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
-        fi
+      uses: ./.github/actions/get-version
 
     - name: Generate changelog
       id: changelog
+      env:
+        EVENT_NAME: ${{ github.event_name }}
+        VERSION: ${{ steps.get_version.outputs.version }}
       run: |
-        if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-          echo "changelog=Manual release of version ${{ steps.get_version.outputs.version }}" >> $GITHUB_OUTPUT
+        if [[ "$EVENT_NAME" == "workflow_dispatch" ]]; then
+          echo "changelog=Manual release of version $VERSION" >> "$GITHUB_OUTPUT"
         else
-          # Get commits since last tag
-          PREVIOUS_TAG=$(git describe --abbrev=0 --tags $(git rev-list --tags --skip=1 --max-count=1) 2>/dev/null || echo "")
+          PREVIOUS_TAG=$(git describe --abbrev=0 --tags "$(git rev-list --tags --skip=1 --max-count=1)" 2>/dev/null || echo "")
           if [[ -z "$PREVIOUS_TAG" ]]; then
             CHANGELOG=$(git log --pretty=format:"- %s (%h)" --no-merges)
           else
-            CHANGELOG=$(git log ${PREVIOUS_TAG}..HEAD --pretty=format:"- %s (%h)" --no-merges)
+            CHANGELOG=$(git log "${PREVIOUS_TAG}..HEAD" --pretty=format:"- %s (%h)" --no-merges)
           fi
-          echo "changelog<<EOF" >> $GITHUB_OUTPUT
-          echo "$CHANGELOG" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          {
+            echo "changelog<<EOF"
+            echo "$CHANGELOG"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
         fi
 
     - name: Download iOS artifact
@@ -226,20 +188,26 @@ jobs:
 
     steps:
     - name: Check publish status
+      env:
+        IOS_RESULT: ${{ needs.build-ios.result }}
+        MAC_RESULT: ${{ needs.build-maccatalyst.result }}
+        RELEASE_RESULT: ${{ needs.create-release.result }}
       run: |
-        echo "## Release Summary" >> $GITHUB_STEP_SUMMARY
-        echo "" >> $GITHUB_STEP_SUMMARY
-        echo "### Build Status" >> $GITHUB_STEP_SUMMARY
-        echo "- iOS: ${{ needs.build-ios.result }}" >> $GITHUB_STEP_SUMMARY
-        echo "- macOS Catalyst: ${{ needs.build-maccatalyst.result }}" >> $GITHUB_STEP_SUMMARY
-        echo "- Release: ${{ needs.create-release.result }}" >> $GITHUB_STEP_SUMMARY
+        {
+          echo "## Release Summary"
+          echo ""
+          echo "### Build Status"
+          echo "- iOS: $IOS_RESULT"
+          echo "- macOS Catalyst: $MAC_RESULT"
+          echo "- Release: $RELEASE_RESULT"
+        } >> "$GITHUB_STEP_SUMMARY"
 
-        if [[ "${{ needs.build-ios.result }}" == "success" ]] && [[ "${{ needs.build-maccatalyst.result }}" == "success" ]] && [[ "${{ needs.create-release.result }}" == "success" ]]; then
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "✅ All builds succeeded and artifacts published" >> $GITHUB_STEP_SUMMARY
+        if [[ "$IOS_RESULT" == "success" ]] && [[ "$MAC_RESULT" == "success" ]] && [[ "$RELEASE_RESULT" == "success" ]]; then
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "All builds succeeded and artifacts published" >> "$GITHUB_STEP_SUMMARY"
           exit 0
         else
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "❌ One or more steps failed" >> $GITHUB_STEP_SUMMARY
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "One or more steps failed" >> "$GITHUB_STEP_SUMMARY"
           exit 1
         fi

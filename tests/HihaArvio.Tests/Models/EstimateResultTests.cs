@@ -3,8 +3,14 @@ using HihaArvio.Models;
 
 namespace HihaArvio.Tests.Models;
 
+/// <summary>
+/// Tests for the <see cref="EstimateResult"/> model, verifying construction, property validation, and the factory method.
+/// </summary>
 public class EstimateResultTests
 {
+    /// <summary>
+    /// Verifies that all properties are correctly assigned during object initialization.
+    /// </summary>
     [Fact]
     public void EstimateResult_ShouldCreateWithAllProperties()
     {
@@ -36,6 +42,9 @@ public class EstimateResultTests
         result.ShakeDuration.Should().Be(duration);
     }
 
+    /// <summary>
+    /// Verifies that ShakeIntensity accepts valid values within the 0.0 to 1.0 range.
+    /// </summary>
     [Theory]
     [InlineData(0.0)]
     [InlineData(0.3)]
@@ -50,6 +59,9 @@ public class EstimateResultTests
         result.ShakeIntensity.Should().Be(intensity);
     }
 
+    /// <summary>
+    /// Verifies that ShakeIntensity throws ArgumentOutOfRangeException for values outside 0.0 to 1.0.
+    /// </summary>
     [Theory]
     [InlineData(-0.1)]
     [InlineData(1.1)]
@@ -64,6 +76,9 @@ public class EstimateResultTests
             .WithMessage("*must be between 0.0 and 1.0*");
     }
 
+    /// <summary>
+    /// Verifies that setting EstimateText to null throws an ArgumentNullException.
+    /// </summary>
     [Fact]
     public void EstimateResult_ShouldThrowForNullEstimateText()
     {
@@ -75,6 +90,9 @@ public class EstimateResultTests
             .WithParameterName("value");
     }
 
+    /// <summary>
+    /// Verifies that setting EstimateText to empty or whitespace-only strings throws an ArgumentException.
+    /// </summary>
     [Theory]
     [InlineData("")]
     [InlineData("   ")]
@@ -88,6 +106,9 @@ public class EstimateResultTests
             .WithMessage("*cannot be empty or whitespace*");
     }
 
+    /// <summary>
+    /// Verifies that ShakeDuration accepts a zero TimeSpan value.
+    /// </summary>
     [Fact]
     public void EstimateResult_ShouldAcceptZeroDuration()
     {
@@ -98,6 +119,9 @@ public class EstimateResultTests
         result.ShakeDuration.Should().Be(TimeSpan.Zero);
     }
 
+    /// <summary>
+    /// Verifies that the Create factory method generates unique non-empty IDs for each instance.
+    /// </summary>
     [Fact]
     public void EstimateResult_ShouldGenerateUniqueIds()
     {
@@ -111,6 +135,9 @@ public class EstimateResultTests
         result2.Id.Should().NotBeEmpty();
     }
 
+    /// <summary>
+    /// Verifies that the Create factory method automatically sets the Timestamp to the current UTC time.
+    /// </summary>
     [Fact]
     public void EstimateResult_Create_ShouldSetTimestampAutomatically()
     {
@@ -126,6 +153,9 @@ public class EstimateResultTests
         result.Timestamp.Should().BeOnOrBefore(after);
     }
 
+    /// <summary>
+    /// Verifies that the Create factory method correctly assigns all provided property values.
+    /// </summary>
     [Fact]
     public void EstimateResult_Create_ShouldSetAllProperties()
     {

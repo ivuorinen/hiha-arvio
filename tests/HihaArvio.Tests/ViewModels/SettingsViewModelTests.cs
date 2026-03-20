@@ -6,6 +6,9 @@ using NSubstitute;
 
 namespace HihaArvio.Tests.ViewModels;
 
+/// <summary>
+/// Tests for the SettingsViewModel covering initialization, save operations, mode selection, history size configuration, property change notifications, and integration scenarios.
+/// </summary>
 public class SettingsViewModelTests
 {
     private readonly IStorageService _storageService;
@@ -27,6 +30,9 @@ public class SettingsViewModelTests
 
     #region Initialization Tests
 
+    /// <summary>
+    /// Verifies that settings are loaded from storage during initialization.
+    /// </summary>
     [Fact]
     public async Task Constructor_ShouldLoadSettings()
     {
@@ -45,6 +51,9 @@ public class SettingsViewModelTests
         await storageService.Received(1).LoadSettingsAsync();
     }
 
+    /// <summary>
+    /// Verifies that the SaveSettingsCommand is initialized.
+    /// </summary>
     [Fact]
     public void Constructor_ShouldHaveSaveSettingsCommand()
     {
@@ -56,6 +65,9 @@ public class SettingsViewModelTests
 
     #region Save Settings Tests
 
+    /// <summary>
+    /// Verifies that executing SaveSettingsCommand calls the storage service.
+    /// </summary>
     [Fact]
     public async Task SaveSettingsCommand_ShouldSaveToStorage()
     {
@@ -66,6 +78,9 @@ public class SettingsViewModelTests
         await _storageService.Received(1).SaveSettingsAsync(Arg.Any<AppSettings>());
     }
 
+    /// <summary>
+    /// Verifies that the current SelectedMode and MaxHistorySize values are saved.
+    /// </summary>
     [Fact]
     public async Task SaveSettingsCommand_ShouldSaveCurrentSettings()
     {
@@ -86,6 +101,9 @@ public class SettingsViewModelTests
 
     #region Selected Mode Tests
 
+    /// <summary>
+    /// Verifies that setting SelectedMode updates the property value.
+    /// </summary>
     [Fact]
     public void SelectedMode_WhenChanged_ShouldUpdateProperty()
     {
@@ -96,6 +114,9 @@ public class SettingsViewModelTests
         _viewModel.SelectedMode.Should().Be(EstimateMode.Generic);
     }
 
+    /// <summary>
+    /// Verifies that Work mode can be selected.
+    /// </summary>
     [Fact]
     public void SelectedMode_ShouldSupportWorkMode()
     {
@@ -106,6 +127,9 @@ public class SettingsViewModelTests
         _viewModel.SelectedMode.Should().Be(EstimateMode.Work);
     }
 
+    /// <summary>
+    /// Verifies that Generic mode can be selected.
+    /// </summary>
     [Fact]
     public void SelectedMode_ShouldSupportGenericMode()
     {
@@ -122,6 +146,9 @@ public class SettingsViewModelTests
 
     #region Max History Size Tests
 
+    /// <summary>
+    /// Verifies that setting MaxHistorySize updates the property value.
+    /// </summary>
     [Fact]
     public void MaxHistorySize_WhenChanged_ShouldUpdateProperty()
     {
@@ -132,6 +159,9 @@ public class SettingsViewModelTests
         _viewModel.MaxHistorySize.Should().Be(50);
     }
 
+    /// <summary>
+    /// Verifies that valid MaxHistorySize values are accepted without exceptions.
+    /// </summary>
     [Fact]
     public void MaxHistorySize_ShouldAcceptValidValues()
     {
@@ -145,6 +175,9 @@ public class SettingsViewModelTests
 
     #region Property Change Notification Tests
 
+    /// <summary>
+    /// Verifies that changing SelectedMode raises PropertyChanged.
+    /// </summary>
     [Fact]
     public void SelectedMode_WhenChanged_ShouldRaisePropertyChanged()
     {
@@ -163,6 +196,9 @@ public class SettingsViewModelTests
         propertyChangedRaised.Should().BeTrue();
     }
 
+    /// <summary>
+    /// Verifies that changing MaxHistorySize raises PropertyChanged.
+    /// </summary>
     [Fact]
     public void MaxHistorySize_WhenChanged_ShouldRaisePropertyChanged()
     {
@@ -185,6 +221,9 @@ public class SettingsViewModelTests
 
     #region Integration Tests
 
+    /// <summary>
+    /// Verifies that modified settings are correctly persisted when saved.
+    /// </summary>
     [Fact]
     public async Task ChangeSettings_ThenSave_ShouldPersistChanges()
     {
@@ -201,6 +240,9 @@ public class SettingsViewModelTests
             s.MaxHistorySize == 30));
     }
 
+    /// <summary>
+    /// Verifies that loaded settings populate the ViewModel properties.
+    /// </summary>
     [Fact]
     public async Task LoadSettings_ShouldPopulateProperties()
     {
