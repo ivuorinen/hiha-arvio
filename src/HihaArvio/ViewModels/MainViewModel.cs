@@ -23,6 +23,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     private EstimateMode _selectedMode;
 
     private ShakeData? _lastShakeData;
+    private int _disposed;
 
     public MainViewModel(
         IShakeDetectionService shakeDetectionService,
@@ -115,13 +116,15 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
             // Save to storage
             await _storageService.SaveEstimateAsync(estimate);
-
-            // Reset shake detection for next shake
-            _shakeDetectionService.Reset();
         }
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"Failed to generate/save estimate: {ex.Message}");
+        }
+        finally
+        {
+            // Always reset shake detection for next shake, even if save fails
+            _shakeDetectionService.Reset();
         }
     }
 
@@ -130,6 +133,9 @@ public partial class MainViewModel : ObservableObject, IDisposable
     /// </summary>
     public void Dispose()
     {
+        if (Interlocked.Exchange(ref _disposed, 1) != 0)
+            return;
+
         // Unsubscribe from events
         _shakeDetectionService.ShakeDataChanged -= OnShakeDataChanged;
 

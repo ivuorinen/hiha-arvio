@@ -261,4 +261,25 @@ public class SettingsViewModelTests
     }
 
     #endregion
+
+    #region Error Handling Tests
+
+    /// <summary>
+    /// Verifies that SaveSettingsAsync does not throw when storage throws.
+    /// </summary>
+    [Fact]
+    public async Task SaveSettingsCommand_WhenStorageThrows_ShouldNotThrow()
+    {
+        // Arrange
+        _storageService.SaveSettingsAsync(Arg.Any<AppSettings>())
+            .Returns(Task.FromException(new InvalidOperationException("Storage failure")));
+
+        // Act
+        var act = async () => await _viewModel.SaveSettingsCommand.ExecuteAsync(null);
+
+        // Assert
+        await act.Should().NotThrowAsync();
+    }
+
+    #endregion
 }

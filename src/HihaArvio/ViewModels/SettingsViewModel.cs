@@ -43,12 +43,19 @@ public partial class SettingsViewModel : ObservableObject
     [RelayCommand]
     private async Task SaveSettingsAsync()
     {
-        var settings = new AppSettings
+        try
         {
-            SelectedMode = SelectedMode,
-            MaxHistorySize = MaxHistorySize
-        };
+            var settings = new AppSettings
+            {
+                SelectedMode = SelectedMode,
+                MaxHistorySize = MaxHistorySize
+            };
 
-        await _storageService.SaveSettingsAsync(settings);
+            await _storageService.SaveSettingsAsync(settings);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Failed to save settings: {ex.Message}");
+        }
     }
 }

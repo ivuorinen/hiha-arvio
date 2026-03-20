@@ -429,4 +429,55 @@ public class MainViewModelTests
     }
 
     #endregion
+
+    #region Robustness Tests
+
+    /// <summary>
+    /// Verifies that Reset() is called even when SaveEstimateAsync throws an exception.
+    /// </summary>
+    [Fact]
+    public async Task GenerateAndSaveEstimate_WhenSaveThrows_ShouldStillReset()
+    {
+        // Arrange
+        var estimate = EstimateResult.Create("2 weeks", EstimateMode.Work, 0.5, TimeSpan.FromSeconds(5));
+        _estimateService.GenerateEstimate(Arg.Any<double>(), Arg.Any<TimeSpan>(), Arg.Any<EstimateMode>())
+            .Returns(estimate);
+        _storageService.SaveEstimateAsync(Arg.Any<EstimateResult>())
+            .Returns(Task.FromException(new InvalidOperationException("Storage failure")));
+
+        // Start shake
+        _shakeDetectionService.ShakeDataChanged += Raise.Event<EventHandler<ShakeData>>(
+            _shakeDetectionService,
+            new ShakeData { IsShaking = true, Intensity = 0.5, Duration = TimeSpan.FromSeconds(3) });
+
+        // Act - Stop shake (triggers generate + save)
+        _shakeDetectionService.ShakeDataChanged += Raise.Event<EventHandler<ShakeData>>(
+            _shakeDetectionService,
+            new ShakeData { IsShaking = false, Intensity = 0.0, Duration = TimeSpan.Zero });
+
+        await Task.Delay(100);
+
+        // Assert - Reset should still be called despite save failure
+        _shakeDetectionService.Received().Reset();
+    }
+
+    /// <summary>
+    /// Verifies that calling Dispose twice is safe and idempotent.
+    /// </summary>
+    [Fact]
+    public void Dispose_CalledTwice_ShouldBeSafe()
+    {
+        // Act
+        var act = () =>
+        {
+            _viewModel.Dispose();
+            _viewModel.Dispose();
+        };
+
+        // Assert
+        act.Should().NotThrow();
+        _shakeDetectionService.Received(1).StopMonitoring();
+    }
+
+    #endregion
 }

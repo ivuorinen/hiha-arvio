@@ -317,4 +317,42 @@ public class HistoryViewModelTests
     }
 
     #endregion
+
+    #region Error Handling Tests
+
+    /// <summary>
+    /// Verifies that LoadHistoryAsync does not throw when storage throws.
+    /// </summary>
+    [Fact]
+    public async Task LoadHistoryCommand_WhenStorageThrows_ShouldNotThrow()
+    {
+        // Arrange
+        _storageService.GetHistoryAsync(Arg.Any<int>())
+            .Returns(Task.FromException<List<EstimateResult>>(new InvalidOperationException("Storage failure")));
+
+        // Act
+        var act = async () => await _viewModel.LoadHistoryCommand.ExecuteAsync(null);
+
+        // Assert
+        await act.Should().NotThrowAsync();
+    }
+
+    /// <summary>
+    /// Verifies that ClearHistoryAsync does not throw when storage throws.
+    /// </summary>
+    [Fact]
+    public async Task ClearHistoryCommand_WhenStorageThrows_ShouldNotThrow()
+    {
+        // Arrange
+        _storageService.ClearHistoryAsync()
+            .Returns(Task.FromException(new InvalidOperationException("Storage failure")));
+
+        // Act
+        var act = async () => await _viewModel.ClearHistoryCommand.ExecuteAsync(null);
+
+        // Assert
+        await act.Should().NotThrowAsync();
+    }
+
+    #endregion
 }
