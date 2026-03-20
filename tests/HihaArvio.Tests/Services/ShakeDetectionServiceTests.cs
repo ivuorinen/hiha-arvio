@@ -518,4 +518,65 @@ public class ShakeDetectionServiceTests
     }
 
     #endregion
+
+    #region Thread Safety Tests
+
+    /// <summary>
+    /// Verifies that concurrent access to ProcessAccelerometerReading and Reset does not
+    /// throw exceptions and that intensity remains within the valid [0, 1] range.
+    /// </summary>
+    [Fact]
+    public async Task ConcurrentAccess_ProcessAndReset_ShouldNotThrowAndMaintainInvariants()
+    {
+        // Arrange
+        _service.StartMonitoring();
+        var exceptions = new System.Collections.Concurrent.ConcurrentBag<Exception>();
+
+        // Act - Run multiple threads calling ProcessAccelerometerReading and Reset in parallel
+        var tasks = new List<Task>();
+
+        for (int i = 0; i < 4; i++)
+        {
+            tasks.Add(Task.Run(() =>
+            {
+                try
+                {
+                    for (int j = 0; j < 100; j++)
+                    {
+                        _service.ProcessAccelerometerReading(
+                            Random.Shared.NextDouble() * 6.0 - 3.0,
+                            Random.Shared.NextDouble() * 6.0 - 3.0,
+                            Random.Shared.NextDouble() * 6.0 - 3.0);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    exceptions.Add(ex);
+                }
+            }));
+
+            tasks.Add(Task.Run(() =>
+            {
+                try
+                {
+                    for (int j = 0; j < 50; j++)
+                    {
+                        _service.Reset();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    exceptions.Add(ex);
+                }
+            }));
+        }
+
+        await Task.WhenAll(tasks);
+
+        // Assert
+        exceptions.Should().BeEmpty("concurrent access should not cause exceptions");
+        _service.CurrentShakeData.Intensity.Should().BeInRange(0.0, 1.0);
+    }
+
+    #endregion
 }

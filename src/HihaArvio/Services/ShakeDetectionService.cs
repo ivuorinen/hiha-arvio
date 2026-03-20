@@ -24,6 +24,7 @@ public class ShakeDetectionService : IShakeDetectionService
     private DateTimeOffset _shakeStartTime;
     private bool _wasShakingLastUpdate;
     private double _peakIntensity;
+    private readonly object _sync = new();
 
     public ShakeDetectionService(IAccelerometerService accelerometerService)
     {
@@ -52,31 +53,37 @@ public class ShakeDetectionService : IShakeDetectionService
     /// <inheritdoc/>
     public void StartMonitoring()
     {
-        if (_isMonitoring)
+        lock (_sync)
         {
-            return; // Already monitoring
+            if (_isMonitoring)
+            {
+                return; // Already monitoring
+            }
+
+            _isMonitoring = true;
+
+            // Subscribe to accelerometer events
+            _accelerometerService.ReadingChanged += OnAccelerometerReadingChanged;
+            _accelerometerService.Start();
         }
-
-        _isMonitoring = true;
-
-        // Subscribe to accelerometer events
-        _accelerometerService.ReadingChanged += OnAccelerometerReadingChanged;
-        _accelerometerService.Start();
     }
 
     /// <inheritdoc/>
     public void StopMonitoring()
     {
-        if (!_isMonitoring)
+        lock (_sync)
         {
-            return; // Already stopped
+            if (!_isMonitoring)
+            {
+                return; // Already stopped
+            }
+
+            _isMonitoring = false;
+
+            // Unsubscribe from accelerometer events
+            _accelerometerService.ReadingChanged -= OnAccelerometerReadingChanged;
+            _accelerometerService.Stop();
         }
-
-        _isMonitoring = false;
-
-        // Unsubscribe from accelerometer events
-        _accelerometerService.ReadingChanged -= OnAccelerometerReadingChanged;
-        _accelerometerService.Stop();
     }
 
     private void OnAccelerometerReadingChanged(object? sender, SensorReading reading)
@@ -87,84 +94,94 @@ public class ShakeDetectionService : IShakeDetectionService
     /// <inheritdoc/>
     public void Reset()
     {
-        _currentShakeData = new ShakeData
+        lock (_sync)
         {
-            IsShaking = false,
-            Intensity = 0.0,
-            Duration = TimeSpan.Zero
-        };
-        _wasShakingLastUpdate = false;
-        _peakIntensity = 0.0;
+            _currentShakeData = new ShakeData
+            {
+                IsShaking = false,
+                Intensity = 0.0,
+                Duration = TimeSpan.Zero
+            };
+            _wasShakingLastUpdate = false;
+            _peakIntensity = 0.0;
+        }
     }
 
     /// <inheritdoc/>
     public void ProcessAccelerometerReading(double x, double y, double z)
     {
-        if (!_isMonitoring)
+        ShakeData newShakeData;
+        bool fireEvent;
+
+        lock (_sync)
         {
-            return;
-        }
-
-        // Calculate magnitude of acceleration vector
-        var magnitude = Math.Sqrt(x * x + y * y + z * z);
-
-        // Subtract gravity to get shake acceleration (device at rest = 1g)
-        var shakeAcceleration = Math.Max(0, magnitude - GravityG);
-
-        // Determine if shaking based on threshold
-        var isShaking = shakeAcceleration >= ShakeThresholdG;
-
-        // Normalize intensity to 0.0-1.0 range based on max expected shake
-        var normalizedIntensity = isShaking
-            ? Math.Min(1.0, shakeAcceleration / MaxShakeIntensityG)
-            : 0.0;
-
-        // Track shake duration and peak intensity
-        TimeSpan duration;
-        if (isShaking)
-        {
-            if (!_wasShakingLastUpdate)
+            if (!_isMonitoring)
             {
-                // Shake just started - reset start time and peak intensity
-                _shakeStartTime = DateTimeOffset.UtcNow;
-                _peakIntensity = normalizedIntensity;
-                duration = TimeSpan.Zero;
+                return;
+            }
+
+            // Calculate magnitude of acceleration vector
+            var magnitude = Math.Sqrt(x * x + y * y + z * z);
+
+            // Subtract gravity to get shake acceleration (device at rest = 1g)
+            var shakeAcceleration = Math.Max(0, magnitude - GravityG);
+
+            // Determine if shaking based on threshold
+            var isShaking = shakeAcceleration >= ShakeThresholdG;
+
+            // Normalize intensity to 0.0-1.0 range based on max expected shake
+            var normalizedIntensity = isShaking
+                ? Math.Min(1.0, shakeAcceleration / MaxShakeIntensityG)
+                : 0.0;
+
+            // Track shake duration and peak intensity
+            TimeSpan duration;
+            if (isShaking)
+            {
+                if (!_wasShakingLastUpdate)
+                {
+                    // Shake just started - reset start time and peak intensity
+                    _shakeStartTime = DateTimeOffset.UtcNow;
+                    _peakIntensity = normalizedIntensity;
+                    duration = TimeSpan.Zero;
+                }
+                else
+                {
+                    // Shake continuing - calculate duration, track peak
+                    duration = DateTimeOffset.UtcNow - _shakeStartTime;
+                    _peakIntensity = Math.Max(_peakIntensity, normalizedIntensity);
+                }
             }
             else
             {
-                // Shake continuing - calculate duration, track peak
-                duration = DateTimeOffset.UtcNow - _shakeStartTime;
-                _peakIntensity = Math.Max(_peakIntensity, normalizedIntensity);
+                // Not shaking - reset duration
+                duration = TimeSpan.Zero;
             }
+
+            // Report peak intensity during shake, 0 when not shaking
+            var reportedIntensity = isShaking ? _peakIntensity : 0.0;
+
+            // Check if state changed
+            fireEvent = isShaking != _wasShakingLastUpdate ||
+                        Math.Abs(reportedIntensity - _currentShakeData.Intensity) > 0.01 ||
+                        duration != _currentShakeData.Duration;
+
+            // Update current state
+            newShakeData = new ShakeData
+            {
+                IsShaking = isShaking,
+                Intensity = reportedIntensity,
+                Duration = duration
+            };
+            _currentShakeData = newShakeData;
+
+            _wasShakingLastUpdate = isShaking;
         }
-        else
+
+        // Fire event OUTSIDE lock to prevent reentrancy deadlocks
+        if (fireEvent)
         {
-            // Not shaking - reset duration
-            duration = TimeSpan.Zero;
-        }
-
-        // Report peak intensity during shake, 0 when not shaking
-        var reportedIntensity = isShaking ? _peakIntensity : 0.0;
-
-        // Check if state changed
-        var stateChanged = isShaking != _wasShakingLastUpdate ||
-                          Math.Abs(reportedIntensity - _currentShakeData.Intensity) > 0.01 ||
-                          duration != _currentShakeData.Duration;
-
-        // Update current state
-        _currentShakeData = new ShakeData
-        {
-            IsShaking = isShaking,
-            Intensity = reportedIntensity,
-            Duration = duration
-        };
-
-        _wasShakingLastUpdate = isShaking;
-
-        // Fire event if state changed
-        if (stateChanged)
-        {
-            ShakeDataChanged?.Invoke(this, _currentShakeData);
+            ShakeDataChanged?.Invoke(this, newShakeData);
         }
     }
 }
