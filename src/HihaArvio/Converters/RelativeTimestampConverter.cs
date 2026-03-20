@@ -20,6 +20,9 @@ public class RelativeTimestampConverter : IValueConverter
 
         var elapsed = DateTimeOffset.UtcNow - timestamp;
 
+        if (elapsed.TotalSeconds < 0)
+            return "in the future";
+
         return elapsed.TotalSeconds switch
         {
             < 60 => "just now",
