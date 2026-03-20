@@ -51,7 +51,8 @@ public class MainViewModelTests
 
         // Assert
         vm.SelectedMode.Should().Be(EstimateMode.Generic);
-        await storageService.Received(1).LoadSettingsAsync();
+        // LoadSettingsAsync called at least once (constructor + SaveSettingsAsync when mode changes)
+        await storageService.Received().LoadSettingsAsync();
     }
 
     /// <summary>

@@ -1,4 +1,3 @@
-using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using HihaArvio.Models;
 using HihaArvio.Services.Interfaces;
@@ -60,18 +59,29 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     private async Task LoadSettingsAsync()
     {
-        var settings = await _storageService.LoadSettingsAsync();
-        SelectedMode = settings.SelectedMode;
+        try
+        {
+            var settings = await _storageService.LoadSettingsAsync();
+            SelectedMode = settings.SelectedMode;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Failed to load settings: {ex.Message}");
+        }
     }
 
     private async Task SaveSettingsAsync()
     {
-        var settings = new AppSettings
+        try
         {
-            SelectedMode = SelectedMode,
-            MaxHistorySize = 10 // Default value, will be managed by SettingsViewModel
-        };
-        await _storageService.SaveSettingsAsync(settings);
+            var settings = await _storageService.LoadSettingsAsync();
+            settings.SelectedMode = SelectedMode;
+            await _storageService.SaveSettingsAsync(settings);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Failed to save settings: {ex.Message}");
+        }
     }
 
     private void OnShakeDataChanged(object? sender, ShakeData shakeData)
@@ -92,20 +102,27 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     private async Task GenerateAndSaveEstimateAsync(ShakeData shakeData)
     {
-        // Generate estimate based on shake data
-        var estimate = _estimateService.GenerateEstimate(
-            shakeData.Intensity,
-            shakeData.Duration,
-            SelectedMode);
+        try
+        {
+            // Generate estimate based on shake data
+            var estimate = _estimateService.GenerateEstimate(
+                shakeData.Intensity,
+                shakeData.Duration,
+                SelectedMode);
 
-        // Update current estimate
-        CurrentEstimate = estimate;
+            // Update current estimate
+            CurrentEstimate = estimate;
 
-        // Save to storage
-        await _storageService.SaveEstimateAsync(estimate);
+            // Save to storage
+            await _storageService.SaveEstimateAsync(estimate);
 
-        // Reset shake detection for next shake
-        _shakeDetectionService.Reset();
+            // Reset shake detection for next shake
+            _shakeDetectionService.Reset();
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Failed to generate/save estimate: {ex.Message}");
+        }
     }
 
     /// <summary>

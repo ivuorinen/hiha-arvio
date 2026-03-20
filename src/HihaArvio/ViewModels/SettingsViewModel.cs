@@ -28,9 +28,16 @@ public partial class SettingsViewModel : ObservableObject
 
     private async Task LoadSettingsAsync()
     {
-        var settings = await _storageService.LoadSettingsAsync();
-        SelectedMode = settings.SelectedMode;
-        MaxHistorySize = settings.MaxHistorySize;
+        try
+        {
+            var settings = await _storageService.LoadSettingsAsync();
+            SelectedMode = settings.SelectedMode;
+            MaxHistorySize = settings.MaxHistorySize;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Failed to load settings: {ex.Message}");
+        }
     }
 
     [RelayCommand]
