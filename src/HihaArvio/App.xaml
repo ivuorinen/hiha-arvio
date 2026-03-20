@@ -17,6 +17,8 @@
             <converters:BoolToShakingConverter x:Key="BoolToShakingConverter"/>
             <converters:BoolToColorConverter x:Key="BoolToColorConverter"/>
             <converters:InvertedBoolConverter x:Key="InvertedBoolConverter"/>
+            <converters:RelativeTimestampConverter x:Key="RelativeTimestampConverter"/>
+            <converters:ModeToColorConverter x:Key="ModeToColorConverter"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>
