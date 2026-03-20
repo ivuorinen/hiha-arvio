@@ -55,52 +55,10 @@
                                FontAttributes="Bold"
                                HorizontalTextAlignment="Center"
                                TextColor="{StaticResource Primary}"/>
-                        <Label FontSize="14"
-                               HorizontalTextAlignment="Center"
-                               TextColor="{StaticResource Gray500}">
-                            <Label.FormattedText>
-                                <FormattedString>
-                                    <Span Text="Mode: "/>
-                                    <Span Text="{Binding CurrentEstimate.Mode}" FontAttributes="Bold"/>
-                                    <Span Text=" | Intensity: "/>
-                                    <Span Text="{Binding CurrentEstimate.ShakeIntensity, StringFormat='{0:P0}'}" FontAttributes="Bold"/>
-                                </FormattedString>
-                            </Label.FormattedText>
-                        </Label>
                     </VerticalStackLayout>
                 </VerticalStackLayout>
             </Frame>
 
-            <!-- Current Shake Data (Debug Info) -->
-            <Frame BorderColor="{StaticResource Secondary}" Padding="15">
-                <VerticalStackLayout Spacing="10">
-                    <Label Text="Shake Status"
-                           FontSize="18"
-                           FontAttributes="Bold"/>
-
-                    <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="5">
-                        <Label Grid.Row="0" Grid.Column="0" Text="Status:" FontAttributes="Bold"/>
-                        <Label Grid.Row="0" Grid.Column="1"
-                               Text="{Binding CurrentShakeData.IsShaking, Converter={StaticResource BoolToShakingConverter}}"
-                               TextColor="{Binding CurrentShakeData.IsShaking, Converter={StaticResource BoolToColorConverter}}"/>
-
-                        <Label Grid.Row="1" Grid.Column="0" Text="Intensity:" FontAttributes="Bold"/>
-                        <Label Grid.Row="1" Grid.Column="1"
-                               Text="{Binding CurrentShakeData.Intensity, StringFormat='{0:P0}'}"/>
-
-                        <Label Grid.Row="2" Grid.Column="0" Text="Duration:" FontAttributes="Bold"/>
-                        <Label Grid.Row="2" Grid.Column="1"
-                               Text="{Binding CurrentShakeData.Duration, StringFormat='{0:0.0} seconds'}"/>
-                    </Grid>
-                </VerticalStackLayout>
-            </Frame>
-
-            <!-- Info Text -->
-            <Label Text="Note: Shake detection requires accelerometer support. Desktop users: feature coming soon!"
-                   FontSize="12"
-                   TextColor="{StaticResource Gray500}"
-                   HorizontalTextAlignment="Center"
-                   Margin="0,10,0,0"/>
 
         </VerticalStackLayout>
     </ScrollView>
