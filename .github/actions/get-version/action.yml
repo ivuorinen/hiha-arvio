@@ -14,7 +14,8 @@ runs:
       shell: bash
       run: |
         if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-          echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          RAW_VERSION="${{ github.event.inputs.version }}"
+          echo "version=${RAW_VERSION#v}" >> $GITHUB_OUTPUT
         else
           echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
         fi
