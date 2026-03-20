@@ -23,6 +23,7 @@ public class ShakeDetectionService : IShakeDetectionService
     private bool _isMonitoring;
     private DateTimeOffset _shakeStartTime;
     private bool _wasShakingLastUpdate;
+    private double _peakIntensity;
 
     public ShakeDetectionService(IAccelerometerService accelerometerService)
     {
@@ -36,6 +37,7 @@ public class ShakeDetectionService : IShakeDetectionService
         };
         _isMonitoring = false;
         _wasShakingLastUpdate = false;
+        _peakIntensity = 0.0;
     }
 
     /// <inheritdoc/>
@@ -92,6 +94,7 @@ public class ShakeDetectionService : IShakeDetectionService
             Duration = TimeSpan.Zero
         };
         _wasShakingLastUpdate = false;
+        _peakIntensity = 0.0;
     }
 
     /// <inheritdoc/>
@@ -116,20 +119,22 @@ public class ShakeDetectionService : IShakeDetectionService
             ? Math.Min(1.0, shakeAcceleration / MaxShakeIntensityG)
             : 0.0;
 
-        // Track shake duration
+        // Track shake duration and peak intensity
         TimeSpan duration;
         if (isShaking)
         {
             if (!_wasShakingLastUpdate)
             {
-                // Shake just started - reset start time
+                // Shake just started - reset start time and peak intensity
                 _shakeStartTime = DateTimeOffset.UtcNow;
+                _peakIntensity = normalizedIntensity;
                 duration = TimeSpan.Zero;
             }
             else
             {
-                // Shake continuing - calculate duration
+                // Shake continuing - calculate duration, track peak
                 duration = DateTimeOffset.UtcNow - _shakeStartTime;
+                _peakIntensity = Math.Max(_peakIntensity, normalizedIntensity);
             }
         }
         else
@@ -138,16 +143,19 @@ public class ShakeDetectionService : IShakeDetectionService
             duration = TimeSpan.Zero;
         }
 
+        // Report peak intensity during shake, 0 when not shaking
+        var reportedIntensity = isShaking ? _peakIntensity : 0.0;
+
         // Check if state changed
         var stateChanged = isShaking != _wasShakingLastUpdate ||
-                          Math.Abs(normalizedIntensity - _currentShakeData.Intensity) > 0.01 ||
+                          Math.Abs(reportedIntensity - _currentShakeData.Intensity) > 0.01 ||
                           duration != _currentShakeData.Duration;
 
         // Update current state
         _currentShakeData = new ShakeData
         {
             IsShaking = isShaking,
-            Intensity = normalizedIntensity,
+            Intensity = reportedIntensity,
             Duration = duration
         };
 

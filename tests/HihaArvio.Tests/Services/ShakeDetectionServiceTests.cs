@@ -396,6 +396,81 @@ public class ShakeDetectionServiceTests
 
     #endregion
 
+    #region Peak Intensity Tests
+
+    /// <summary>
+    /// Verifies that the service reports peak intensity rather than instantaneous intensity during a shake.
+    /// Per spec §3.1.1: Track peak magnitude during entire shake session.
+    /// </summary>
+    [Fact]
+    public void ProcessAccelerometerReading_DuringShake_ShouldReportPeakIntensity()
+    {
+        // Arrange
+        _service.StartMonitoring();
+
+        // Act - Start with strong shake
+        _service.ProcessAccelerometerReading(3.0, 3.0, 3.0); // High intensity
+        var peakIntensity = _service.CurrentShakeData.Intensity;
+
+        // Then reduce shake strength
+        _service.ProcessAccelerometerReading(2.0, 1.5, 1.5); // Lower intensity
+
+        // Assert - Should still report the peak intensity
+        _service.CurrentShakeData.Intensity.Should().Be(peakIntensity,
+            "intensity should remain at peak during a shake session");
+        _service.CurrentShakeData.IsShaking.Should().BeTrue();
+    }
+
+    /// <summary>
+    /// Verifies that peak intensity increases when a stronger reading arrives.
+    /// </summary>
+    [Fact]
+    public void ProcessAccelerometerReading_WithIncreasingShake_ShouldUpdatePeak()
+    {
+        // Arrange
+        _service.StartMonitoring();
+
+        // Act - Start with moderate shake
+        _service.ProcessAccelerometerReading(2.0, 1.5, 1.5);
+        var firstPeak = _service.CurrentShakeData.Intensity;
+
+        // Then increase shake strength
+        _service.ProcessAccelerometerReading(3.0, 3.0, 3.0);
+        var secondPeak = _service.CurrentShakeData.Intensity;
+
+        // Assert - Peak should increase
+        secondPeak.Should().BeGreaterThan(firstPeak,
+            "peak should increase with stronger readings");
+    }
+
+    /// <summary>
+    /// Verifies that peak intensity resets when a new shake session begins.
+    /// </summary>
+    [Fact]
+    public void ProcessAccelerometerReading_NewShakeSession_ShouldResetPeak()
+    {
+        // Arrange
+        _service.StartMonitoring();
+
+        // First shake session with high intensity
+        _service.ProcessAccelerometerReading(3.0, 3.0, 3.0);
+        var firstPeak = _service.CurrentShakeData.Intensity;
+        firstPeak.Should().BeGreaterThan(0.5);
+
+        // Stop shaking
+        _service.ProcessAccelerometerReading(0.0, 0.0, 1.0);
+        _service.CurrentShakeData.IsShaking.Should().BeFalse();
+
+        // Start new shake with moderate intensity
+        _service.ProcessAccelerometerReading(2.0, 1.5, 1.5);
+
+        // Assert - Peak should be based on new session, not carry over
+        _service.CurrentShakeData.Intensity.Should().BeLessThan(firstPeak,
+            "peak should reset for new shake session");
+    }
+
+    #endregion
+
     #region Edge Cases
 
     /// <summary>
