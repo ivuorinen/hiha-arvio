@@ -9,14 +9,10 @@ namespace HihaArvio.Services;
 /// </summary>
 public class IosAccelerometerService : IAccelerometerService
 {
-#pragma warning disable CS0649 // Field is never assigned (conditional compilation)
-    private bool _isMonitoring;
-#pragma warning restore CS0649
+    private bool _isMonitoring = false;
 
     /// <inheritdoc/>
-#pragma warning disable CS0067 // Event is never used (conditional compilation)
     public event EventHandler<SensorReading>? ReadingChanged;
-#pragma warning restore CS0067
 
     /// <inheritdoc/>
     public bool IsSupported =>
@@ -47,6 +43,9 @@ public class IosAccelerometerService : IAccelerometerService
             // Accelerometer not supported or permission denied
             // Fail silently - IsSupported will be false
         }
+#else
+        // Accelerometer not available on this platform
+        _ = ReadingChanged;
 #endif
     }
 
