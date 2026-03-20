@@ -62,16 +62,16 @@ The following rules are derived from CLAUDE.md and additional Copilot-specific c
 | C# Language | 13 |
 | Microsoft.Maui.Controls | v10 |
 | Microsoft.Maui.Controls.Compatibility | v10 |
-| CommunityToolkit.Mvvm | 8.4.0 |
+| CommunityToolkit.Mvvm | 8.4.1 |
 | SQLite (sqlite-net-pcl) | 1.9.172 |
 | SQLitePCLRaw.bundle_green | 2.1.11 |
 | Microsoft.Extensions.Logging.Debug | v10 |
 | xUnit | 2.9.3 |
-| xunit.runner.visualstudio | 2.8.2 |
+| xunit.runner.visualstudio | 3.1.5 |
 | Microsoft.NET.Test.Sdk | 18.3.0 |
 | NSubstitute | 5.3.0 |
-| FluentAssertions | 8.8.0 |
-| coverlet.collector | 8.0.0 |
+| FluentAssertions | 8.9.0 |
+| coverlet.collector | 8.0.1 |
 
 ## Key Files
 
