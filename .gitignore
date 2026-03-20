@@ -117,3 +117,6 @@ ehthumbs.db
 **/[Aa]ndroid/**/[Rr]esource.designer.cs
 **/[Ii]OS/**/[Rr]esource.designer.cs
 *.sarif
+
+# Claude Code local settings
+.claude.local.md
