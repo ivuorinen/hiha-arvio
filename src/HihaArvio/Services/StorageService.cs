@@ -10,22 +10,39 @@ namespace HihaArvio.Services;
 public class StorageService : IStorageService
 {
     private readonly SQLiteAsyncConnection _database;
+    private readonly SemaphoreSlim _initLock = new(1, 1);
+    private bool _initialized;
 
     public StorageService(string databasePath)
     {
         _database = new SQLiteAsyncConnection(databasePath);
-        InitializeDatabaseAsync().Wait();
     }
 
-    private async Task InitializeDatabaseAsync()
+    private async Task EnsureInitializedAsync()
     {
-        await _database.CreateTableAsync<SettingsEntity>();
-        await _database.CreateTableAsync<EstimateHistoryEntity>();
+        if (_initialized) return;
+
+        await _initLock.WaitAsync();
+        try
+        {
+            if (!_initialized)
+            {
+                await _database.CreateTableAsync<SettingsEntity>();
+                await _database.CreateTableAsync<EstimateHistoryEntity>();
+                _initialized = true;
+            }
+        }
+        finally
+        {
+            _initLock.Release();
+        }
     }
 
     /// <inheritdoc/>
     public async Task SaveSettingsAsync(AppSettings settings)
     {
+        await EnsureInitializedAsync();
+
         var entity = new SettingsEntity
         {
             Id = 1, // Single settings row
@@ -33,20 +50,14 @@ public class StorageService : IStorageService
             MaxHistorySize = settings.MaxHistorySize
         };
 
-        var existing = await _database.Table<SettingsEntity>().FirstOrDefaultAsync(s => s.Id == 1);
-        if (existing != null)
-        {
-            await _database.UpdateAsync(entity);
-        }
-        else
-        {
-            await _database.InsertAsync(entity);
-        }
+        await _database.InsertOrReplaceAsync(entity);
     }
 
     /// <inheritdoc/>
     public async Task<AppSettings> LoadSettingsAsync()
     {
+        await EnsureInitializedAsync();
+
         var entity = await _database.Table<SettingsEntity>().FirstOrDefaultAsync(s => s.Id == 1);
 
         if (entity == null)
@@ -69,6 +80,8 @@ public class StorageService : IStorageService
     /// <inheritdoc/>
     public async Task SaveEstimateAsync(EstimateResult estimate)
     {
+        await EnsureInitializedAsync();
+
         var entity = new EstimateHistoryEntity
         {
             Id = estimate.Id.ToString(),
@@ -103,6 +116,8 @@ public class StorageService : IStorageService
     /// <inheritdoc/>
     public async Task<List<EstimateResult>> GetHistoryAsync(int count = 10)
     {
+        await EnsureInitializedAsync();
+
         if (count <= 0)
         {
             return new List<EstimateResult>();
@@ -130,12 +145,14 @@ public class StorageService : IStorageService
     /// <inheritdoc/>
     public async Task ClearHistoryAsync()
     {
+        await EnsureInitializedAsync();
         await _database.DeleteAllAsync<EstimateHistoryEntity>();
     }
 
     /// <inheritdoc/>
     public async Task<int> GetHistoryCountAsync()
     {
+        await EnsureInitializedAsync();
         return await _database.Table<EstimateHistoryEntity>().CountAsync();
     }
 
