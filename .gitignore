@@ -45,6 +45,7 @@ _ReSharper*/
 *.coverage
 *.coveragexml
 **/TestResults/
+coverage/
 
 # NuGet Packages
 *.nupkg
