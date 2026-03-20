@@ -7,11 +7,12 @@ namespace HihaArvio.Services;
 /// <summary>
 /// SQLite-based storage service for persisting application settings and estimate history.
 /// </summary>
-public class StorageService : IStorageService
+public class StorageService : IStorageService, IDisposable
 {
     private readonly SQLiteAsyncConnection _database;
     private readonly SemaphoreSlim _initLock = new(1, 1);
     private bool _initialized;
+    private int _disposed;
 
     public StorageService(string databasePath)
     {
@@ -106,10 +107,8 @@ public class StorageService : IStorageService
                 .Take(excessCount)
                 .ToListAsync();
 
-            foreach (var old in oldestEstimates)
-            {
-                await _database.DeleteAsync(old);
-            }
+            var ids = string.Join("','", oldestEstimates.Select(e => e.Id));
+            await _database.ExecuteAsync($"DELETE FROM EstimateHistory WHERE Id IN ('{ids}')");
         }
     }
 
@@ -188,5 +187,16 @@ public class StorageService : IStorageService
         public double ShakeIntensity { get; set; }
 
         public TimeSpan ShakeDuration { get; set; }
+    }
+
+    /// <summary>
+    /// Disposes the SemaphoreSlim used for initialization locking.
+    /// </summary>
+    public void Dispose()
+    {
+        if (Interlocked.Exchange(ref _disposed, 1) != 0)
+            return;
+
+        _initLock.Dispose();
     }
 }

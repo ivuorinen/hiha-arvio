@@ -325,4 +325,54 @@ public class StorageServiceTests : IDisposable
     }
 
     #endregion
+
+    #region Dispose Tests
+
+    /// <summary>
+    /// Verifies that Dispose completes without error.
+    /// </summary>
+    [Fact]
+    public void Dispose_ShouldNotThrow()
+    {
+        // Arrange
+        var dbPath = Path.Combine(Path.GetTempPath(), $"test_dispose_{Guid.NewGuid()}.db");
+        var service = new StorageService(dbPath);
+
+        // Act
+        var act = () => ((IDisposable)service).Dispose();
+
+        // Assert
+        act.Should().NotThrow();
+
+        // Cleanup
+        if (File.Exists(dbPath))
+            File.Delete(dbPath);
+    }
+
+    /// <summary>
+    /// Verifies that calling Dispose twice is safe (idempotent).
+    /// </summary>
+    [Fact]
+    public void Dispose_CalledTwice_ShouldBeSafe()
+    {
+        // Arrange
+        var dbPath = Path.Combine(Path.GetTempPath(), $"test_dispose2_{Guid.NewGuid()}.db");
+        var service = new StorageService(dbPath);
+
+        // Act
+        var act = () =>
+        {
+            ((IDisposable)service).Dispose();
+            ((IDisposable)service).Dispose();
+        };
+
+        // Assert
+        act.Should().NotThrow();
+
+        // Cleanup
+        if (File.Exists(dbPath))
+            File.Delete(dbPath);
+    }
+
+    #endregion
 }
