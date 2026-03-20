@@ -31,12 +31,7 @@ public partial class HistoryViewModel : ObservableObject
     {
         var estimates = await _storageService.GetHistoryAsync();
 
-        History.Clear();
-        foreach (var estimate in estimates)
-        {
-            History.Add(estimate);
-        }
-
+        History = new ObservableCollection<EstimateResult>(estimates);
         IsEmpty = History.Count == 0;
     }
 

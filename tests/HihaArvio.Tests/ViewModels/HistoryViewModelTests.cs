@@ -247,14 +247,18 @@ public class HistoryViewModelTests
     #region Property Change Notification Tests
 
     /// <summary>
-    /// Verifies that the ObservableCollection fires CollectionChanged events when loaded.
+    /// Verifies that loading history replaces the collection and raises PropertyChanged.
     /// </summary>
     [Fact]
     public async Task History_WhenLoadHistoryCalled_ShouldPopulateCollection()
     {
         // Arrange
-        var collectionChangedCount = 0;
-        _viewModel.History.CollectionChanged += (sender, args) => collectionChangedCount++;
+        var propertyChangedRaised = false;
+        _viewModel.PropertyChanged += (sender, args) =>
+        {
+            if (args.PropertyName == nameof(HistoryViewModel.History))
+                propertyChangedRaised = true;
+        };
 
         var estimates = new List<EstimateResult>
         {
@@ -266,7 +270,7 @@ public class HistoryViewModelTests
         await _viewModel.LoadHistoryCommand.ExecuteAsync(null);
 
         // Assert
-        collectionChangedCount.Should().BeGreaterThan(0);
+        propertyChangedRaised.Should().BeTrue();
         _viewModel.History.Should().HaveCount(1);
     }
 
