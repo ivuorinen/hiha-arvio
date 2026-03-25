@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <!-- Main project packages -->
-    <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.1" />
+    <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.2" />
     <PackageVersion Include="Microsoft.Maui.Controls" Version="10.0.50" />
     <PackageVersion Include="Microsoft.Maui.Controls.Compatibility" Version="10.0.50" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Debug" Version="10.0.5" />
