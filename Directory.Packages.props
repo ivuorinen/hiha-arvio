@@ -7,8 +7,8 @@
   <ItemGroup>
     <!-- Main project packages -->
     <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.2" />
-    <PackageVersion Include="Microsoft.Maui.Controls" Version="10.0.50" />
-    <PackageVersion Include="Microsoft.Maui.Controls.Compatibility" Version="10.0.50" />
+    <PackageVersion Include="Microsoft.Maui.Controls" Version="10.0.51" />
+    <PackageVersion Include="Microsoft.Maui.Controls.Compatibility" Version="10.0.51" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Debug" Version="10.0.5" />
     <PackageVersion Include="sqlite-net-pcl" Version="1.9.172" />
     <PackageVersion Include="SQLitePCLRaw.bundle_green" Version="2.1.11" />
