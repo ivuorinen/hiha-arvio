@@ -9,10 +9,14 @@ runs:
       with:
         global-json-file: global.json
 
+    # Track the newest stable Xcode on the runner instead of a hard pin. The MAUI workload
+    # restored below floats to the latest .NET for iOS/MacCatalyst SDK, which in turn requires
+    # the matching (latest) Xcode. Pinning an older Xcode here is what broke the build whenever
+    # the workload advanced (e.g. iOS SDK 26.5 needs Xcode 26.5, while this was pinned to 26.2).
     - name: Select Xcode version
       uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1.7.0
       with:
-        xcode-version: '26.2'
+        xcode-version: latest-stable
 
     - name: Restore workloads
       shell: bash
