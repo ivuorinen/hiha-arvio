@@ -2,5 +2,32 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "local>ivuorinen/renovate-config"
+  ],
+  "packageRules": [
+    {
+      "description": "Update the whole .NET 10 stack (SDK in global.json, runtime libraries and MAUI) together in a single PR. Bumping these piecemeal is what caused the version drift between the SDK band, Microsoft.Extensions.* and Microsoft.Maui.*.",
+      "matchManagers": ["nuget", "dotnet-version"],
+      "matchPackageNames": [
+        "dotnet-sdk",
+        "/^Microsoft\\.Maui/",
+        "/^Microsoft\\.Extensions\\./",
+        "/^Microsoft\\.NETCore\\./",
+        "/^Microsoft\\.AspNetCore\\./"
+      ],
+      "groupName": "dotnet monorepo"
+    },
+    {
+      "description": "Group the test tooling so the test SDK and runners move together.",
+      "matchManagers": ["nuget"],
+      "matchPackageNames": [
+        "Microsoft.NET.Test.Sdk",
+        "coverlet.collector",
+        "xunit",
+        "/^xunit\\./",
+        "NSubstitute",
+        "FluentAssertions"
+      ],
+      "groupName": "test dependencies"
+    }
   ]
 }

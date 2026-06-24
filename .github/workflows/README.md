@@ -150,12 +150,17 @@ For signed releases, add:
 - **Publish**: `macos-26` (Apple Silicon runner with Xcode 26 for MAUI workloads)
 
 ### External Actions Used
-- `actions/checkout@v6.0.2` - Checkout repository
-- `actions/setup-dotnet@v5.2.0` - Setup .NET SDK
-- `actions/upload-artifact@v7.0.0` - Upload build artifacts
-- `softprops/action-gh-release@v2.6.1` - Create GitHub releases
+
+All third-party actions are pinned to a commit SHA (with the version in a trailing comment)
+and kept current by Renovate.
+
+- `actions/checkout@v7.0.0` - Checkout repository
+- `actions/setup-dotnet@v5.3.0` - Setup .NET SDK
+- `maxim-lobanov/setup-xcode@v1.7.0` - Select Xcode version (MAUI builds)
+- `actions/upload-artifact@v7.0.1` - Upload build artifacts
 - `actions/download-artifact@v8.0.1` - Download build artifacts for release
-- `dorny/test-reporter@v2.6.0` - Generate test reports
+- `softprops/action-gh-release@v3.0.0` - Create GitHub releases
+- `dorny/test-reporter@v3.0.0` - Generate test reports
 
 ---
 
