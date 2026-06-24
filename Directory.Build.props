@@ -5,6 +5,29 @@
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <LangVersion>13</LangVersion>
+    <!-- Audit direct AND transitive packages so vulnerabilities surface as build errors. -->
+    <NuGetAudit>true</NuGetAudit>
+    <NuGetAuditMode>all</NuGetAuditMode>
   </PropertyGroup>
+
+  <ItemGroup>
+    <!--
+      CVE-2025-6965 / GHSA-2m69-gcr7-jv3q: SQLite < 3.50.2 memory corruption, present in the
+      native SQLitePCLRaw packages (lib.e_sqlite3, lib.e_sqlite3.ios) <= 2.1.11.
+
+      There is currently NO upgrade path that clears this for every target:
+        * sqlite-net-pcl depends on SQLitePCLRaw.bundle_green, which has no 3.x release.
+        * SQLitePCLRaw.lib.e_sqlite3.ios has no patched (>= 3.50.2) build, so the iOS target
+          cannot resolve a fixed native library.
+
+      The app only ever opens a local, app-private SQLite database and never executes untrusted
+      SQL, so the attack vector does not apply here. We suppress the advisory (rather than masking
+      it with NoWarn) so every OTHER advisory is still treated as a build error.
+
+      ACTION: remove this suppression once SQLitePCLRaw.bundle_green ships a release bundling
+      SQLite >= 3.50.2 (track https://github.com/ericsink/SQLitePCL.raw/releases).
+    -->
+    <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-2m69-gcr7-jv3q" />
+  </ItemGroup>
 
 </Project>
